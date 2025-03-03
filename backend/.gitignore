@@ -1,0 +1,29 @@
+# Игнорируем node_modules (зависимости)
+node_modules/
+  
+# Игнорируем файлы сборки и выходные файлы
+dist/
+build/
+
+# Файлы конфигурации окружения
+.env
+.env.local
+.env.*.local
+
+# Кэш файлов и временные файлы
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+  
+# Игнорируем файлы операционных систем и редакторов
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Кэш TypeScript
+*.tsbuildinfo
