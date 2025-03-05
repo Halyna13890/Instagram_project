@@ -5,6 +5,9 @@ export interface IntUser extends Document {
     email: string;
     fullName: string;
     username: string;
+    about?: string;
+    photoProfile?: string;
+    website?: string;
     password: string;
     comparePassword(candidatePassword: string): Promise<boolean>;
 }
@@ -23,6 +26,21 @@ const UserSchema: Schema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
+    },
+    about:{
+        type:String,
+        required: false,
+        default: ""
+    },
+    photoProfile:{
+        type: String,
+        required: false,
+        default: ""
+    },
+    website:{
+        type: String,
+        required: false,
+        default: ""
     },
     password: {
         type: String,

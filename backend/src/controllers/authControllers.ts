@@ -1,6 +1,7 @@
 import User, { IntUser } from "../models/User";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { AuthRequest } from "../middleware/authMidlleware";
 
 export const registerUser = async (req: Request, res: Response): Promise<any> => {
     try {
@@ -42,7 +43,7 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
             return res.status(400).json({ message: "Login or password is incorrect" });
         }
 
-        const token = jwt.sign({ userId: existingUser._id }, process.env.JWT_SECRET as string, { expiresIn: "1h" });
+        const token = jwt.sign({ userId: existingUser._id }, process.env.JWT_SECRET as string, { expiresIn: "8h" });
 
         res.status(200).json({
             message: "Login successful",
@@ -57,3 +58,39 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
         res.status(500).json({ error: error.message });
     }
 };
+
+
+export const getEditProfile = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const profile = await User.findById(req.userId).select("username about photoProfile website")
+
+        if(!profile){
+            res.status(404).json({message: "Profile not faund"})
+        }
+
+        res.status(200).json(profile)
+    } catch (error: any) {
+        res.status(500).json({error: error.message})
+    }
+
+}
+
+
+export const updateEditProfile = async (req: AuthRequest, res: Response): Promise<void>  =>{
+   try{
+    const {username, about, photoProfile, website} = req.body
+    const updatedProfile = await User.findByIdAndUpdate(req.userId, 
+        {username, about, photoProfile, website},
+        { new: true, runValidators: true }
+    ).select("-password")
+    if(!updatedProfile){
+        res.status(404).json({message:"Profile not found"})
+        return
+    }
+    res.status(200).json({message:"Profile was successfully updated", updatedProfile})
+    return
+   } catch (error: any){ 
+        res.status(500).json({error: error.message})
+   }
+}
+
