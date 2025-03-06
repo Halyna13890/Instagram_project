@@ -3,8 +3,9 @@ import mongoose, {Schema, Document, Types} from "mongoose";
 interface IPost extends Document{
     image: string,
     text: string,
-    user: Types.ObjectId
-    createAt: Date
+    user: Types.ObjectId,
+    createAt: Date,
+    likesCount: number,
 }
 
 const postSchema = new mongoose.Schema<IPost>({
@@ -20,6 +21,10 @@ const postSchema = new mongoose.Schema<IPost>({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true
+    },
+    likesCount:{
+        type:Number,
+        default: 0
     },
     createAt:{
         type: Date,

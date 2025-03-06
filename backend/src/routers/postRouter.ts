@@ -1,16 +1,19 @@
 import express,{Router} from "express"
+import {uploadMiddleware} from "../middleware/uploadMidlleware"
 import {
     createPost,
+    getUserPosts,
     deletePost,
-    getPosts,
+    getAllPosts,
     updatePost,
 } from "../controllers/postControllers"
 import {authMiddleware} from "../middleware/authMidlleware"
 
 const router: Router = express.Router();
-router.get("/", authMiddleware, getPosts)
-router.post("/", authMiddleware, createPost)
-router.put("/:id", authMiddleware, updatePost)
+router.get("/", authMiddleware, getAllPosts)
+router.get("/oneuser/:id", authMiddleware, getUserPosts)
+router.post("/", authMiddleware, uploadMiddleware.single("image"), createPost)
+router.put("/:id", authMiddleware, uploadMiddleware.single("image"), updatePost)
 router.delete("/:id", authMiddleware, deletePost)
 
-export default router;
+export default router

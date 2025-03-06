@@ -2,6 +2,7 @@ import User, { IntUser } from "../models/User";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { AuthRequest } from "../middleware/authMidlleware";
+import { identifierToKeywordKind } from "typescript";
 
 export const registerUser = async (req: Request, res: Response): Promise<any> => {
     try {
@@ -60,15 +61,21 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
 };
 
 
-export const getEditProfile = async (req: AuthRequest, res: Response): Promise<void> => {
+export const getProfile = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-        const profile = await User.findById(req.userId).select("username about photoProfile website")
+       
+        const {id} = req.params
+      
+        
+        const profile = await User.findById(id).select("username about photoProfile website")
 
         if(!profile){
             res.status(404).json({message: "Profile not faund"})
+            return
         }
 
         res.status(200).json(profile)
+        return
     } catch (error: any) {
         res.status(500).json({error: error.message})
     }
@@ -76,21 +83,36 @@ export const getEditProfile = async (req: AuthRequest, res: Response): Promise<v
 }
 
 
-export const updateEditProfile = async (req: AuthRequest, res: Response): Promise<void>  =>{
-   try{
-    const {username, about, photoProfile, website} = req.body
-    const updatedProfile = await User.findByIdAndUpdate(req.userId, 
-        {username, about, photoProfile, website},
-        { new: true, runValidators: true }
-    ).select("-password")
-    if(!updatedProfile){
-        res.status(404).json({message:"Profile not found"})
-        return
-    }
-    res.status(200).json({message:"Profile was successfully updated", updatedProfile})
-    return
-   } catch (error: any){ 
-        res.status(500).json({error: error.message})
-   }
-}
+export const updateEditProfile = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params
+        const { username, about, website } = req.body
 
+        if (req.userId !== id) {
+            res.status(403).json({ message: "Access denied" })
+            return;
+        }
+
+        let base64Image = ''
+        if (req.file) {
+            const imageBuffer = req.file.buffer;
+            base64Image = `data:${req.file.mimetype};base64,${imageBuffer.toString('base64')}`
+        }
+
+        const updatedProfile = await User.findByIdAndUpdate(
+            req.userId,
+            { username, about, image: base64Image, website },
+            { new: true, runValidators: true }
+        ).select("-password");
+
+        if (!updatedProfile) {
+            res.status(404).json({ message: "Profile not found" });
+            return;
+        }
+
+        res.status(200).json({
+            message: "Profile was successfully updated",updatedProfile });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+};
