@@ -3,6 +3,8 @@ import express, {Application, Request, Response} from "express"
 import connectDb from "./config/config";
 import authRouter from "./routers/authRouter"
 import postRouter from "./routers/postRouter"
+import likeRouter from "./routers/likeRouter"
+
 
 const app: Application = express();
 app.use(express.json())
@@ -13,6 +15,7 @@ const MONGO_URI = process.env.MONGO_URI
 
 app.use('/auth', authRouter)
 app.use('/posts', postRouter)
+app.use('/like', likeRouter)
 
 
 app.get("/", (reg: Request, res: Response) => {
