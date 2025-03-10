@@ -3,7 +3,9 @@ import { AuthRequest } from "../middleware/authMidlleware";
 import mongoose from "mongoose";
 import { IntUser } from "../models/User"
 import User from "../models/User"
-import Follower, { PopulatedFollower } from "../models/Followers";
+import Follower, { PopulatedFollower, PopulatedFollowerEntry} from "../models/Followers";
+import {followersFormatTimeDifference} from "../utils/followerTimeFormat"
+
 
 export const getAllFollowers = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
@@ -16,8 +18,9 @@ export const getAllFollowers = async (req: AuthRequest, res: Response): Promise<
             return;
         }
 
-        const followerData = await Follower.findOne({ user: new mongoose.Types.ObjectId(userId) })
-            .populate("followers.follower_id", "username image") as unknown as PopulatedFollower | null;
+        const followerData = await Follower.findOne({ user: userId })
+            .populate<{ followers: { follower_id: IntUser }[] }>("followers.follower_id", "username image")
+            .lean();
 
       
         if (!followerData) {
@@ -43,7 +46,8 @@ export const getFollowing = async (req: AuthRequest, res: Response): Promise<voi
         const { userId } = req.params;
         
         const followingData = await Follower.find({ "followers.follower_id": userId })
-        .populate("user", "username image") as unknown as Array<PopulatedFollower & { user: IntUser }>;
+            .populate<{ user: IntUser }>("user", "username image")
+            .lean();
         
         if (!followingData || followingData.length === 0) {
             res.status(404).json({ message: "User is not following anyone" });
@@ -66,13 +70,12 @@ export const getFollowing = async (req: AuthRequest, res: Response): Promise<voi
 
 export const toggleFollowing = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-        console.log("Received request to toggle following");
+       
 
         const { follovingUser } = req.params;
         const userId = req.userId;
 
-        console.log("Extracted userId from token:", userId);
-        console.log("Extracted follovingUser from params:", follovingUser);
+        
 
         if (!userId) {
             console.error("userId is missing");
@@ -81,7 +84,7 @@ export const toggleFollowing = async (req: AuthRequest, res: Response): Promise<
         }
 
         if (!mongoose.Types.ObjectId.isValid(follovingUser)) {
-            console.error("Invalid follovingUserId:", follovingUser);
+            
             res.status(400).json({ message: "Invalid follovingUserId" });
             return;
         }
@@ -92,10 +95,9 @@ export const toggleFollowing = async (req: AuthRequest, res: Response): Promise<
        
 
         const existingFollowingUser = await Follower.findOne({ user: follovingUserId });
-        console.log("Existing Following User:", existingFollowingUser);
-
+        
         if (!existingFollowingUser) {
-            console.log("No existing following record found. Creating new...");
+           
 
             const NewFollower = new Follower({
                 user: follovingUserId,
@@ -123,6 +125,7 @@ export const toggleFollowing = async (req: AuthRequest, res: Response): Promise<
             }
 
             res.status(201).json({ message: "Followed successfully" });
+
         } else {
            
             const isAlreadyFollowing = existingFollowingUser.followers.some(f => f.follower_id.toString() === userId);
@@ -154,7 +157,8 @@ export const toggleFollowing = async (req: AuthRequest, res: Response): Promise<
 
             } else {
                
-                existingFollowingUser.followers = existingFollowingUser.followers.filter(f => f.follower_id.toString() !== userId);
+                existingFollowingUser.followers = existingFollowingUser.followers
+                .filter(f => f.follower_id.toString() !== userId);
                 
                 if (existingFollowingUser.followers.length === 0) {
                     console.log("No followers left. Deleting document...");
@@ -185,6 +189,47 @@ export const toggleFollowing = async (req: AuthRequest, res: Response): Promise<
         }
     } catch (error: any) {
         
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+
+
+export const getFollowersNotifications = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const userId = req.userId;
+        console.log("Received request for followers of user:", userId);
+
+        const myFollowers = await Follower.findOne({ user: userId })
+            .populate<{ followers: PopulatedFollowerEntry[] }>("followers.follower_id", "username image")
+            .lean();
+        
+        console.log("Query result from database:", myFollowers);
+
+        if (!myFollowers) {
+            console.log("No followers found for user:", userId);
+            res.status(404).json({ message: "User has no followers" });
+            return;
+        }
+
+        console.log("Raw followers array:", myFollowers.followers);
+
+        const formattedFollower = myFollowers.followers.map(follower => {
+            console.log("Processing follower:", follower);
+            return {
+                id: follower.follower_id._id, 
+                username: follower.follower_id.username,
+                image: follower.follower_id.image,
+                timeMessage: followersFormatTimeDifference(follower.createdAt) 
+            };
+        });
+
+        console.log("Formatted followers data:", formattedFollower);
+        res.json(formattedFollower);
+
+    } catch (error: any) {
+        console.error("Error fetching followers:", error.message);
         res.status(500).json({ error: error.message });
     }
 };

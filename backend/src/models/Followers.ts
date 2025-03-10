@@ -8,7 +8,7 @@ interface FollowerEntry {
 }
 
 
-interface PopulatedFollowerEntry {
+export interface PopulatedFollowerEntry {
     follower_id: IntUser;
     createdAt: Date;
 }

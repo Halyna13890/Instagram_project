@@ -51,6 +51,29 @@ export const getUserPosts = async (req: AuthRequest, res: Response): Promise<voi
 };
 
 
+
+
+export const getOnePost = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const post = await Post.findById(id)
+        .populate("user", "image username")
+
+        if(!post){
+            res.status(404).json({ message: "Post not found" });
+            return;
+        }
+
+    }catch (error: any) {
+       
+        res.status(500).json({ error: error.message });
+        return  
+    }
+}
+
+
+
+
 export const createPost = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const { text } = req.body;
@@ -136,3 +159,5 @@ export const createPost = async (req: AuthRequest, res: Response): Promise<void>
             res.status(500).json({ error: error.message });
         }
     };
+
+

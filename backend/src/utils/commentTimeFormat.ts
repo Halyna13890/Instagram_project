@@ -1,4 +1,4 @@
-export function likeFormatTimeDifference(createdAt: Date): string {
+export function commentFormatTimeDifference(createdAt: Date): string {
     const now = new Date();
     const diffInMilliseconds = now.getTime() - new Date(createdAt).getTime();
     
@@ -10,13 +10,13 @@ export function likeFormatTimeDifference(createdAt: Date): string {
     
     
     if (diffInDays > 0) {
-      return `likes your post ${diffInDays} ${diffInDays === 1 ? 'day' : 'days'} ago`;
+      return `commented your post ${diffInDays} ${diffInDays === 1 ? 'day' : 'days'} ago`;
     } else if (diffInHours > 0) {
-      return `likes your post ${diffInHours} ${diffInHours === 1 ? 'hour' : 'hours'} ago`;
+      return `commented your post ${diffInHours} ${diffInHours === 1 ? 'hour' : 'hours'} ago`;
     } else if (diffInMinutes > 0) {
-      return `likes your post ${diffInMinutes} ${diffInMinutes === 1 ? 'minute' : 'minutes'} ago`;
+      return `commented your post ${diffInMinutes} ${diffInMinutes === 1 ? 'minute' : 'minutes'} ago`;
     } else {
-      return `likes your post ${diffInSeconds} ${diffInSeconds === 1 ? 'second' : 'seconds'} ago`;
+      return `commented your post ${diffInSeconds} ${diffInSeconds === 1 ? 'second' : 'seconds'} ago`;
     }
   }
   

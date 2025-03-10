@@ -3,14 +3,14 @@ import { AuthRequest } from "../middleware/authMidlleware";
 import mongoose from "mongoose";
 import Post from "../models/Post";
 import Comment from "../models/Comment";
+import { IntUser } from "../models/User";
+import {commentFormatTimeDifference}  from "../utils/commentTimeFormat"
 
 
 export const createComment = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const { post, message } = req.body;
         const user = req.userId; 
-
-        
 
        
         if (!post || !message || !user) {
@@ -19,18 +19,28 @@ export const createComment = async (req: AuthRequest, res: Response): Promise<vo
         }
 
         const postId = new mongoose.Types.ObjectId(post); 
-       
-        console.log("Converted postId:", postId);
-
+        
         
         if (!postId) {
-            console.log("Invalid postId");
+           
             res.status(400).json({ message: "Invalid postId" });
             return;
         }
 
+        const postDocument = await Post.findById(postId)
+        if(!postDocument){
+            res.status(404).json({message: "Post not found"})
+            return;
+        }
         
-        const newComment = new Comment({ user: user, post: postId, message });
+        const PostUser = postDocument.user
+
+        const newComment = new Comment({ 
+            user: user, 
+            post: postId, 
+            message,
+            postUser: PostUser
+        });
 
        
         await newComment.save();
@@ -85,3 +95,27 @@ export const getPostsComments = async (req: AuthRequest, res: Response): Promise
        return 
     }
 };
+
+
+
+export const getCommentNotifications = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const userId = req.userId;
+
+        const CommentUsers = await Comment.find({ postUser: userId })
+            .populate<{ user: IntUser }>("user", "username image")
+            .lean();
+
+        const formattedLikes = CommentUsers.map(comment => ({
+            id: comment._id,
+            username: comment.user.username, 
+            image: comment.user.image,
+            timeMessage: commentFormatTimeDifference(comment.createdAt)
+        }));
+
+        res.json(formattedLikes);
+
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+}
