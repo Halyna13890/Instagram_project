@@ -10,6 +10,10 @@ export interface IntUser extends Document {
     website?: string;
     password: string;
     comparePassword(candidatePassword: string): Promise<boolean>;
+    resetPasswordToken?: string;
+    resetPasswordExpires?: number;
+    followers: number;
+    following: number;
 }
 
 const UserSchema: Schema = new mongoose.Schema({
@@ -45,6 +49,22 @@ const UserSchema: Schema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
+    },
+    resetPasswordToken: {
+        type: String,
+        required: false,
+    },
+    resetPasswordExpires: {
+        type: Number,
+        required: false,
+    },
+    followers:{
+        type:Number,
+        default: 0
+    }, 
+    following: {
+        type:Number,
+        default: 0
     }
 });
 

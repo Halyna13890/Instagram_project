@@ -1,10 +1,10 @@
 import express,{Router} from "express"
 import {authMiddleware} from "../middleware/authMidlleware"
-import {createLike, deleteLike} from "../controllers/likeControllers"
+import {toggleLike} from "../controllers/likeControllers"
 
 
 const router: Router = express.Router();
-router.post("/", authMiddleware, createLike)
-router.delete("/", authMiddleware, deleteLike)
+router.post('/toggle', authMiddleware, toggleLike)
+
 
 export default router

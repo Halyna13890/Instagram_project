@@ -6,7 +6,10 @@ import mongoose from "mongoose";
 
 export const getAllPosts = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-        const posts = await Post.find({});
+        const posts = await Post.find({})     
+        .populate("user", "image username")
+        
+  
 
         if (!posts || posts.length === 0) {
             res.status(404).json({ message: "Posts not found" });
@@ -28,7 +31,9 @@ export const getUserPosts = async (req: AuthRequest, res: Response): Promise<voi
            return 
         }
 
-        const userPosts = await Post.find({ user: id });
+        const userPosts = await Post.find({ user: id })
+        .populate("user", "image username")
+        
 
         if (!userPosts || userPosts.length === 0) {
              res.status(404).json({ message: "User posts not found" });

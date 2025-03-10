@@ -2,7 +2,8 @@ import User, { IntUser } from "../models/User";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { AuthRequest } from "../middleware/authMidlleware";
-import { identifierToKeywordKind } from "typescript";
+import crypto from "crypto";
+import { sendResetPasswordEmail } from "../services/mailService";
 
 export const registerUser = async (req: Request, res: Response): Promise<any> => {
     try {
@@ -24,7 +25,7 @@ export const registerUser = async (req: Request, res: Response): Promise<any> =>
         return res.status(201).json({ message: "User registered successfully" });
 
     } catch (error: any) {
-        console.error("Error in registerUser:", error);
+        
         return res.status(500).json({ error: error.message });
     }
 };
@@ -116,3 +117,100 @@ export const updateEditProfile = async (req: AuthRequest, res: Response): Promis
         res.status(500).json({ error: error.message });
     }
 };
+
+
+
+
+
+
+export const requestPasswordReset = async (req: AuthRequest, res: Response): Promise<void>  => {
+    try {
+        const userId = req.userId;
+        if (!userId) {
+            res.status(401).json({ message: "Unauthorized request" });
+            return 
+        }
+
+       
+        const user = await User.findById(userId) as IntUser;
+        if (!user) {
+             res.status(404).json({ message: "User not found" });
+             return
+        }
+
+       
+        const token = crypto.randomBytes(32).toString("hex");
+
+        user.resetPasswordToken = token;
+        user.resetPasswordExpires = Date.now() + 3600000; 
+
+        await user.save();
+
+    
+        await sendResetPasswordEmail(user.email, token);
+
+        res.json({ message: "Password reset link has been sent to your email" });
+    } catch (error: any) {
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+
+export const resetPassword = async (req: Request, res: Response): Promise<void>=> {
+    try {
+        const { token } = req.params; 
+        const { newPassword } = req.body;
+
+     
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: Date.now() } 
+        });
+
+        if (!user) {
+             res.status(400).json({ message: "Invalid or expired token" });
+             return
+        }
+
+
+        user.password = newPassword;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+
+        await user.save();
+
+        res.json({ message: "Password successfully changed" });
+    } catch (error) {
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+
+
+
+
+
+export const searchUser = async (req:AuthRequest, res: Response): Promise <void> => {
+    try {
+        const { search } = req.query; 
+
+        let filter = {};
+
+        if (search) {
+            filter = {
+                $or: [
+                    { username: { $regex: search, $options: "i" } }, 
+                    { fullName: { $regex: search, $options: "i" } }  
+                ]
+            };
+        }
+
+        const users = await User.find(filter).select("username fullName image");
+
+        res.json(users);
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+

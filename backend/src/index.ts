@@ -1,9 +1,13 @@
 import "dotenv/config"
 import express, {Application, Request, Response} from "express"
 import connectDb from "./config/config";
-import authRouter from "./routers/authRouter"
+import userRouter from "./routers/userRouter"
 import postRouter from "./routers/postRouter"
 import likeRouter from "./routers/likeRouter"
+import commentRouter from "./routers/commentRouter"
+import followerRouter from "./routers/followerRouter"
+
+
 
 
 const app: Application = express();
@@ -13,9 +17,11 @@ connectDb()
 const PORT = process.env.PORT || 3333;
 const MONGO_URI = process.env.MONGO_URI
 
-app.use('/auth', authRouter)
+app.use('/user', userRouter)
 app.use('/posts', postRouter)
 app.use('/like', likeRouter)
+app.use('/comment', commentRouter)
+app.use('/follow', followerRouter)
 
 
 app.get("/", (reg: Request, res: Response) => {

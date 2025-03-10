@@ -6,6 +6,7 @@ interface IPost extends Document{
     user: Types.ObjectId,
     createAt: Date,
     likesCount: number,
+    commentCount: number,
 }
 
 const postSchema = new mongoose.Schema<IPost>({
@@ -26,11 +27,15 @@ const postSchema = new mongoose.Schema<IPost>({
         type:Number,
         default: 0
     },
+    commentCount:{
+        type:Number,
+        default: 0
+    },
     createAt:{
         type: Date,
         default: Date.now
     }
-})
+}, { timestamps: true })
 
 
 const Post = mongoose.model<IPost>('Post', postSchema)
