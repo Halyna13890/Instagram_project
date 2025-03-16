@@ -6,7 +6,7 @@ import { createComment,
 
 
 const router: Router = express.Router();
-router.post("/create", authMiddleware, createComment)
+router.post("/create/:postId", authMiddleware, createComment)
 router.get("/all/:id", authMiddleware, getPostsComments)
 router.get("/time", authMiddleware, getCommentNotifications)
 

@@ -7,6 +7,51 @@ import { likeFormatTimeDifference } from "../utils/likeTimeFormat"
 import { IntUser } from "../models/User";
 
 
+export const checkLikesForPosts = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const userId = req.userId;
+        let { postIds } = req.body;
+
+        
+        if (!Array.isArray(postIds)) {
+            postIds = [postIds];
+            console.log('postIds is not an array, converted to array:', postIds);
+        }
+
+        
+        postIds = postIds.filter((id: string) => mongoose.Types.ObjectId.isValid(id));
+        
+
+        if (postIds.length === 0) {
+            res.status(400).json({ message: "postIds must contain valid post IDs" });
+            return;
+        }
+
+        
+        const existingLikes = await Like.find({
+            user: userId,
+            post: { $in: postIds },
+        });
+
+        
+        const result = postIds.reduce((acc: Record<string, boolean>, postId: string) => {
+            console.log('Checking like for postId:', postId);
+            acc[postId] = existingLikes.some(like => like.post.toString() === postId);
+            return acc;
+        }, {} as Record<string, boolean>);
+
+        
+
+        res.status(200).json(result);
+    } catch (error: any) {
+        console.error('Error occurred:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+
+
 export const toggleLike = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const { post } = req.body;
@@ -45,7 +90,7 @@ export const toggleLike = async (req: AuthRequest, res: Response): Promise<void>
                 await updatedPost.save(); 
             }
 
-            res.status(201).json({ message: "Like added", post: updatedPost });
+            res.status(201).json({ message: "Like added", post: updatedPost, isLike: true });
 
         } else {
            
@@ -58,7 +103,7 @@ export const toggleLike = async (req: AuthRequest, res: Response): Promise<void>
                 await updatedPost.save();  
             }
 
-            res.status(200).json({ message: "Like removed", post: updatedPost });
+            res.status(200).json({ message: "Like removed", post: updatedPost, isLike: false });
         }
 
     } catch (error: any) {

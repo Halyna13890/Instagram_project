@@ -7,6 +7,45 @@ import Follower, { PopulatedFollower, PopulatedFollowerEntry} from "../models/Fo
 import {followersFormatTimeDifference} from "../utils/followerTimeFormat"
 
 
+export const checkFollowingForUsers = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const userId = req.userId;
+      let { creatorIds } = req.body;
+  
+      
+     
+      if (!Array.isArray(creatorIds)) {
+        creatorIds = [creatorIds];
+        console.log('creatorIds is not an array, converted to array:', creatorIds);
+      }
+  
+      creatorIds = creatorIds.filter((id:string) => typeof id === 'string' && id.trim() !== '');
+     
+  
+      if (creatorIds.length === 0) {
+        res.status(400).json({ message: "creatorIds must contain valid user IDs" });
+        return;
+      }
+  
+      const followings = await Follower.find({
+        user: { $in: creatorIds },
+        "followers.follower_id": userId,
+      });
+  
+    
+      const result = creatorIds.reduce((acc: Record<string, boolean>, id: string) => {
+        acc[id] = followings.some(f => f.user.toString() === id.toString());
+        return acc;
+      }, {} as Record<string, boolean>);
+  
+    
+  
+      res.status(200).json(result); 
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  };
+  
 export const getAllFollowers = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const { userId } = req.params;
@@ -40,6 +79,9 @@ export const getAllFollowers = async (req: AuthRequest, res: Response): Promise<
         res.status(500).json({ error: error.message });
     }
 };
+
+
+
 
 export const getFollowing = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
@@ -124,7 +166,7 @@ export const toggleFollowing = async (req: AuthRequest, res: Response): Promise<
                 
             }
 
-            res.status(201).json({ message: "Followed successfully" });
+            res.status(201).json({ message: "Followed successfully" , isFollowing: true});
 
         } else {
            
@@ -153,7 +195,7 @@ export const toggleFollowing = async (req: AuthRequest, res: Response): Promise<
                     console.log("Updated following count for", userIdObjectId);
                 }
 
-                res.status(201).json({ message: "Followed successfully" });
+                res.status(201).json({ message: "Followed successfully", isFollowing: true });
 
             } else {
                
@@ -184,7 +226,7 @@ export const toggleFollowing = async (req: AuthRequest, res: Response): Promise<
                    
                 }
 
-                res.status(200).json({ message: "Unfollowed successfully" });
+                res.status(200).json({ message: "Unfollowed successfully" , isFollowing: false});
             }
         }
     } catch (error: any) {

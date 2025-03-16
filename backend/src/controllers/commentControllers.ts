@@ -9,54 +9,33 @@ import {commentFormatTimeDifference}  from "../utils/commentTimeFormat"
 
 export const createComment = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-        const { post, message } = req.body;
-        const user = req.userId; 
+        const { message } = req.body;  
+        const { postId } = req.params;  
+        const user = req.userId;  
 
-       
-        if (!post || !message || !user) {
-            res.status(400).json({ message: "Post, message, and userId are required" });
+        if (!postId || !message || !user) {
+            res.status(400).json({ message: "Post ID, message, and user ID are required" });
             return;
         }
 
-        const postId = new mongoose.Types.ObjectId(post); 
-        
-        
-        if (!postId) {
-           
-            res.status(400).json({ message: "Invalid postId" });
+        const postDocument = await Post.findById(postId);
+        if (!postDocument) {
+            res.status(404).json({ message: "Post not found" });
             return;
         }
 
-        const postDocument = await Post.findById(postId)
-        if(!postDocument){
-            res.status(404).json({message: "Post not found"})
-            return;
-        }
-        
-        const PostUser = postDocument.user
-
-        const newComment = new Comment({ 
-            user: user, 
-            post: postId, 
+        const newComment = new Comment({
+            user: user,
+            post: postId,
             message,
-            postUser: PostUser
+            postUser: postDocument.user
         });
 
-       
         await newComment.save();
 
-        
+        postDocument.commentCount += 1;
+        await postDocument.save();
 
-        
-        const updatedPost = await Post.findById(postId);
-        if (updatedPost) {
-            updatedPost.commentCount += 1;
-            await updatedPost.save();
-
-           
-        }
-
-        
         res.status(201).json({ message: "Comment added", comment: newComment });
 
     } catch (error: any) {
@@ -64,6 +43,7 @@ export const createComment = async (req: AuthRequest, res: Response): Promise<vo
         res.status(500).json({ error: error.message });
     }
 };
+
 
 
 

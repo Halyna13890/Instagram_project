@@ -22,6 +22,34 @@ export const getAllPosts = async (req: AuthRequest, res: Response): Promise<void
     }
 };
 
+
+export const getOnePost = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+         
+        const { id } = req.params; 
+        
+        if (!id) {
+            res.status(400).json({ message: "Post ID is required" });
+            return;
+        }
+        
+        const post = await Post.findById(id)
+            .populate("user", "image username");
+
+       
+        if (!post) {
+            res.status(404).json({ message: "Post not found" });
+            return;
+        }
+
+        res.status(200).json({ post });
+    } catch (error: any) {
+       
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
 export const getUserPosts = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const { id } = req.params; 
@@ -52,24 +80,6 @@ export const getUserPosts = async (req: AuthRequest, res: Response): Promise<voi
 
 
 
-
-export const getOnePost = async (req: AuthRequest, res: Response): Promise<void> => {
-    try {
-        const { id } = req.params;
-        const post = await Post.findById(id)
-        .populate("user", "image username")
-
-        if(!post){
-            res.status(404).json({ message: "Post not found" });
-            return;
-        }
-
-    }catch (error: any) {
-       
-        res.status(500).json({ error: error.message });
-        return  
-    }
-}
 
 
 

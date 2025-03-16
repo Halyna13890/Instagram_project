@@ -4,14 +4,19 @@ import{
     getAllFollowers,
     getFollowing,
     toggleFollowing,
-    getFollowersNotifications
+    getFollowersNotifications,
+    checkFollowingForUsers
 } from "../controllers/followerController"
 
 
 const router: Router = express.Router();
+
+router.get('/followers/check', authMiddleware, checkFollowingForUsers)
 router.get('/followers/:userId', authMiddleware, getAllFollowers)
 router.get('/following/:userId', authMiddleware, getFollowing)
 router.post('/toggle/:follovingUser', authMiddleware, toggleFollowing)
 router.get('/time', authMiddleware, getFollowersNotifications)
+
+
 
 export default router

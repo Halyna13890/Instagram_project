@@ -6,6 +6,10 @@ import postRouter from "./routers/postRouter"
 import likeRouter from "./routers/likeRouter"
 import commentRouter from "./routers/commentRouter"
 import followerRouter from "./routers/followerRouter"
+import cors from 'cors';
+
+
+
 
 
 
@@ -14,8 +18,17 @@ const app: Application = express();
 app.use(express.json())
 connectDb()
 
-const PORT = process.env.PORT || 3333;
+const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI
+
+const corsOptions = {
+    origin: 'http://localhost:5173', 
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', 
+    credentials: true,
+    optionsSuccessStatus: 204,
+  };
+  console.log("CORS options", corsOptions); 
+  app.use(cors(corsOptions));
 
 app.use('/user', userRouter)
 app.use('/posts', postRouter)

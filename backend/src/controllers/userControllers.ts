@@ -22,7 +22,19 @@ export const registerUser = async (req: Request, res: Response): Promise<any> =>
         const newUser = new User({ email, fullName, username, password });
         await newUser.save();
 
-        return res.status(201).json({ message: "User registered successfully" });
+        const userResponse = {
+            email: newUser.email,
+            fullName: newUser.fullName,
+            username: newUser.username,
+            about: newUser.about, 
+            image: newUser.image, 
+            website: newUser.website,
+
+        }
+
+        return res.status(201).json({ message: "User registered successfully", 
+            user: userResponse
+        });
 
     } catch (error: any) {
         
