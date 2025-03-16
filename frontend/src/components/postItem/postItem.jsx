@@ -9,7 +9,7 @@ const PostItem = ({ post }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
-  const [localLikesCount, setLocalLikesCount] = useState(post.likesCount);
+  const [localLikesCount, setLocalLikesCount] = useState(post.likesCount || 0);
 
   const { following } = useSelector((state) => state.follow);
   const { likes } = useSelector((state) => state.likes);
@@ -34,8 +34,8 @@ const PostItem = ({ post }) => {
     dispatch(toggleLike(post._id))
       .unwrap()
       .then((response) => {
-        const { message, post, isLike } = response;
-        setLocalLikesCount(post.likesCount);
+        const { likesCount } = response; // Используем likesCount из ответа
+        setLocalLikesCount(likesCount); // Обновляем localLikesCount
       })
       .catch((error) => {
         console.error("Error toggling like:", error);

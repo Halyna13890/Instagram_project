@@ -6,6 +6,7 @@ import Post from "../models/Post";
 import { likeFormatTimeDifference } from "../utils/likeTimeFormat"
 import { IntUser } from "../models/User";
 
+const { Types } = mongoose;
 
 export const checkLikesForPosts = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
@@ -52,66 +53,95 @@ export const checkLikesForPosts = async (req: AuthRequest, res: Response): Promi
 
 
 
+
+
+
+
 export const toggleLike = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-        const { post } = req.body;
-        const userId = req.userId;
-
-        const postId = new mongoose.Types.ObjectId(post);
-
-        if (!postId) {
-            res.status(400).json({ message: "postId is required" });
-            return;
+      console.log("Запрос получен:", req.body);
+      const { post } = req.body;
+      const userId = req.userId;
+  
+      if (!userId) {
+         res.status(401).json({ message: "User not authenticated" });
+         return
+      }
+  
+      if (!post) {
+         res.status(400).json({ message: "post is required" });
+         return
+      }
+  
+      if (!mongoose.Types.ObjectId.isValid(post)) {
+        res.status(400).json({ message: "Invalid postId" });
+        return 
+      }
+  
+      const postId = new mongoose.Types.ObjectId(post);
+      console.log("Toggle like for postId:", postId);
+  
+      const existingLike = await Like.findOne({ user: userId, post: postId });
+  
+      const updatePostLikesCount = async (postId: mongoose.Types.ObjectId, increment: number) => {
+        const post = await Post.findById(postId);
+        if (post) {
+          post.likesCount += increment;
+          await post.save();
         }
-        
-        const existingLike = await Like.findOne({ user: userId, post: postId });
-
-        if (!existingLike) {
-
-            const postDocument = await Post.findById(postId)
-
-            if(!postDocument){
-                res.status(404).json({message: "Post not found"})
-                return;
-            }
-            const PostUser = postDocument.user
-
-            const newLike = new Like({ 
-                user: userId, 
-                post: postId, 
-                postUser: PostUser,
-            });
-            await newLike.save();
-
-           
-            const updatedPost = await Post.findById(postId);
-            if (updatedPost) {
-                updatedPost.likesCount += 1;
-                await updatedPost.save(); 
-            }
-
-            res.status(201).json({ message: "Like added", post: updatedPost, isLike: true });
-
-        } else {
-           
-            await Like.deleteOne({ _id: existingLike._id });
-
-            
-            const updatedPost = await Post.findById(postId);
-            if (updatedPost) {
-                updatedPost.likesCount -= 1;
-                await updatedPost.save();  
-            }
-
-            res.status(200).json({ message: "Like removed", post: updatedPost, isLike: false });
+        return post;
+      };
+  
+      if (!existingLike) {
+        const postDocument = await Post.findById(postId);
+        if (!postDocument) {
+           res.status(404).json({ message: "Post not found" });
+           return
         }
-
+  
+        const newLike = new Like({ 
+          user: userId, 
+          post: postId, 
+          postUser: postDocument.user,
+        });
+        await newLike.save();
+  
+        const updatedPost = await updatePostLikesCount(postId, 1);
+        if (!updatedPost) {
+          res.status(404).json({ message: "Post not found after updating likes" });
+          return 
+        }
+  
+        res.status(201).json({
+          message: "Like added",
+          postId: postId.toString(),
+          isLike: true,
+          likesCount: updatedPost.likesCount, 
+        });
+        return
+      } else {
+        await Like.deleteOne({ _id: existingLike._id });
+  
+        const updatedPost = await updatePostLikesCount(postId, -1);
+        if (!updatedPost) {
+          res.status(404).json({ message: "Post not found after updating likes" });
+          return 
+        }
+  
+        res.status(200).json({
+          message: "Like removed",
+          postId: postId.toString(), 
+          isLike: false,
+          likesCount: updatedPost.likesCount,
+          
+        });
+        return
+      }
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+      console.error("Ошибка в toggleLike:", error);
+      res.status(500).json({ error: error.message, details: error.stack });
     }
-};
-
-
+  };
 
 
 export const getLikeNotifications = async (req: AuthRequest, res: Response): Promise<void> => {

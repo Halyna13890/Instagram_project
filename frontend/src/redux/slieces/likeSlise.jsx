@@ -23,21 +23,22 @@ export const checkLikesForPosts = createAsyncThunk(
 
 export const toggleLike = createAsyncThunk(
   'likes/toggleLike',
-  async (postId, { getState, rejectWithValue }) => {
+  async (post, { getState, rejectWithValue }) => {
     try {
       console.log("Отправка запроса на:", `${API_URL}/like/toggle`);
+      console.log("Данные запроса:", { post });
 
-      const response = await api.post(`http://localhost:5000/like/toggle`, { postId });
+      const response = await api.post(`${API_URL}/like/toggle`, { post });
 
       console.log("Ответ от сервера:", response.data);
       return response.data;
     } catch (error) {
       console.error("Ошибка при лайке:", error);
+      console.error("Полный объект ошибки:", error);
       return rejectWithValue(error.message);
     }
   }
 );
-
 
 
 
@@ -62,12 +63,14 @@ const likeSlice = createSlice({
       .addCase(toggleLike.fulfilled, (state, action) => {
         const { postId, isLike, likesCount } = action.payload;
         console.log("Updated like state:", postId, isLike, likesCount);
-        state.likes[postId] = { isLike, likesCount };
+        state.likes[postId] = { isLike, likesCount }; 
       })
       .addCase(toggleLike.rejected, (state, action) => {
         state.error = action.payload;
       });
   },
 });
+
+
 
 export default likeSlice.reducer;

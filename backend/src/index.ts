@@ -22,7 +22,7 @@ const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI
 
 const corsOptions = {
-    origin: 'http://localhost:5173', 
+    origin: 'http://localhost:5174', 
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', 
     credentials: true,
     optionsSuccessStatus: 204,
