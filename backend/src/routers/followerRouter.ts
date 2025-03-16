@@ -11,7 +11,7 @@ import{
 
 const router: Router = express.Router();
 
-router.get('/followers/check', authMiddleware, checkFollowingForUsers)
+router.post('/followers/check', authMiddleware, checkFollowingForUsers)
 router.get('/followers/:userId', authMiddleware, getAllFollowers)
 router.get('/following/:userId', authMiddleware, getFollowing)
 router.post('/toggle/:follovingUser', authMiddleware, toggleFollowing)

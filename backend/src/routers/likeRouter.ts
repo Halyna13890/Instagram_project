@@ -4,7 +4,7 @@ import {toggleLike, getLikeNotifications, checkLikesForPosts} from "../controlle
 
 
 const router: Router = express.Router();
-router.get('/check', authMiddleware, checkLikesForPosts)
+router.post('/check', authMiddleware, checkLikesForPosts)
 console.log("Маршрут /like/toggle зарегистрирован");
 router.post('/toggle', authMiddleware, toggleLike)
 router.get('/time', authMiddleware, getLikeNotifications)
