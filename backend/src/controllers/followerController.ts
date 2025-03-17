@@ -9,42 +9,46 @@ import {followersFormatTimeDifference} from "../utils/followerTimeFormat"
 
 export const checkFollowingForUsers = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-      const userId = req.userId;
-      let { creatorIds } = req.body;
+      const userId = req.userId; 
+      let { creatorIds } = req.body; 
   
       
-     
       if (!Array.isArray(creatorIds)) {
         creatorIds = [creatorIds];
         console.log('creatorIds is not an array, converted to array:', creatorIds);
       }
   
-      creatorIds = creatorIds.filter((id:string) => typeof id === 'string' && id.trim() !== '');
-     
+      
+      creatorIds = creatorIds.filter((id: string) => typeof id === 'string' && id.trim() !== '');
   
+     
       if (creatorIds.length === 0) {
         res.status(400).json({ message: "creatorIds must contain valid user IDs" });
         return;
       }
   
+     
       const followings = await Follower.find({
         user: { $in: creatorIds },
         "followers.follower_id": userId,
       });
   
-    
+      
       const result = creatorIds.reduce((acc: Record<string, boolean>, id: string) => {
-        acc[id] = followings.some(f => f.user.toString() === id.toString());
+        acc[id] = followings.some((f) => f.user.toString() === id.toString());
         return acc;
       }, {} as Record<string, boolean>);
   
-    
-  
-      res.status(200).json(result); 
+     
+      res.status(200).json(result);
     } catch (error: any) {
+      
       res.status(500).json({ error: error.message });
     }
   };
+
+
+
   
 export const getAllFollowers = async (req: AuthRequest, res: Response): Promise<void> => {
     try {

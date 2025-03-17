@@ -3,9 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchOnePost } from "../redux/slieces/postSlice";
 import { fetchComments } from "../redux/slieces/commentSlice";
 import { useParams } from "react-router-dom";
-import { toggleFollowing } from "../redux/slieces/followerSlice";
 import defaultPhoto from "../accets/icons8-user-default-64.png";
 import api from "../api/interceptor";
+import FollowButton from "../components/followButton/followButton"
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -24,22 +24,18 @@ const PostModal = () => {
     }
   }, [id, dispatch]);
 
-  useEffect(() => {
-    console.log("Comments from Redux:", comments);
-  }, [comments]);
-
   const handleCreateComment = async () => {
     if (!id) {
       console.error("Post ID is missing");
       return;
     }
-  
+
     if (commentText.trim()) {
       try {
         const response = await api.post(`${API_URL}/comment/create/${id}`, {
           message: commentText,
         });
-  
+
         if (response.data.comment) {
           setCommentText("");
           dispatch(fetchComments(id));
@@ -47,11 +43,6 @@ const PostModal = () => {
       } catch (error) {
         console.error("Ошибка при создании комментария", error);
       }
-    }
-  };
-  const handleFollowToggle = () => {
-    if (singlePost?.user?._id) {
-      dispatch(toggleFollowing(singlePost.user._id));
     }
   };
 
@@ -67,9 +58,7 @@ const PostModal = () => {
         <div>
           <img src={singlePost?.user?.image || defaultPhoto} alt={singlePost?.user?.username || "User"} />
           <p>{singlePost?.user?.username || "Unknown User"}</p>
-          <button onClick={handleFollowToggle}>
-            {singlePost?.user?.isFollowed ? "Unfollow" : "Follow"}
-          </button>
+          <FollowButton userId={singlePost?.user?._id} />
         </div>
         <div>
           <div>
@@ -80,22 +69,22 @@ const PostModal = () => {
             <p>{singlePost?.text || "No text available."}</p>
           </div>
           <div className="comments-section">
-                {loadingComments && <p>Loading comments...</p>}
-                    {errorComments && <p>{errorComments}</p>}
-                        {comments?.length > 0 ? (
-                        comments.map((comment) => (
-                        <div key={comment._id} className="comment">
-                        <div className="comment-user-info">
-                         <img src={comment?.user?.image || defaultPhoto} alt={comment?.user?.username || "User"} />
+            {loadingComments && <p>Loading comments...</p>}
+            {errorComments && <p>{errorComments}</p>}
+            {comments?.length > 0 ? (
+              comments.map((comment) => (
+                <div key={comment._id} className="comment">
+                  <div className="comment-user-info">
+                    <img src={comment?.user?.image || defaultPhoto} alt={comment?.user?.username || "User"} />
                     <p>{comment?.user?.username || "Unknown User"}</p>
+                  </div>
+                  <p>{comment.message}</p>
                 </div>
-                <p>{comment.message}</p>
-            </div>
-    ))
-  ) : (
-    <p>No comments yet.</p>
-  )}
-</div>
+              ))
+            ) : (
+              <p>No comments yet.</p>
+            )}
+          </div>
           <div className="add-comment">
             <textarea
               value={commentText}

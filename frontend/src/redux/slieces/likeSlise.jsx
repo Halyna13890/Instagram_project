@@ -55,7 +55,12 @@ const likeSlice = createSlice({
     builder
       .addCase(checkLikesForPosts.fulfilled, (state, action) => {
         console.log("Fetched likes data:", action.payload);
-        state.likes = action.payload;
+        Object.entries(action.payload).forEach(([postId, data]) => {
+          state.likes[postId] = {
+            isLike: data.isLike,
+            likesCount: data.likesCount,
+          };
+        });
       })
       .addCase(checkLikesForPosts.rejected, (state, action) => {
         state.error = action.payload;
@@ -63,7 +68,8 @@ const likeSlice = createSlice({
       .addCase(toggleLike.fulfilled, (state, action) => {
         const { postId, isLike, likesCount } = action.payload;
         console.log("Updated like state:", postId, isLike, likesCount);
-        state.likes[postId] = { isLike, likesCount }; 
+       
+        state.likes[postId] = { isLike, likesCount };
       })
       .addCase(toggleLike.rejected, (state, action) => {
         state.error = action.payload;
@@ -71,6 +77,6 @@ const likeSlice = createSlice({
   },
 });
 
-
-
 export default likeSlice.reducer;
+
+

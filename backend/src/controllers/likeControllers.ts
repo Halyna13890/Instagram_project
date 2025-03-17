@@ -5,56 +5,55 @@ import Like from "../models/Like";
 import Post from "../models/Post";
 import { likeFormatTimeDifference } from "../utils/likeTimeFormat"
 import { IntUser } from "../models/User";
-
+import { IPost } from '../models/Post';
 const { Types } = mongoose;
 
+
+ 
+
 export const checkLikesForPosts = async (req: AuthRequest, res: Response): Promise<void> => {
-    try {
-        const userId = req.userId;
-        let { postIds } = req.body;
+  try {
+    const userId = req.userId;
+    let { postIds } = req.body;
 
-        
-        if (!Array.isArray(postIds)) {
-            postIds = [postIds];
-            console.log('postIds is not an array, converted to array:', postIds);
-        }
-
-        
-        postIds = postIds.filter((id: string) => mongoose.Types.ObjectId.isValid(id));
-        
-
-        if (postIds.length === 0) {
-            res.status(400).json({ message: "postIds must contain valid post IDs" });
-            return;
-        }
-
-        
-        const existingLikes = await Like.find({
-            user: userId,
-            post: { $in: postIds },
-        });
-
-        
-        const result = postIds.reduce((acc: Record<string, boolean>, postId: string) => {
-            console.log('Checking like for postId:', postId);
-            acc[postId] = existingLikes.some(like => like.post.toString() === postId);
-            return acc;
-        }, {} as Record<string, boolean>);
-
-        
-
-        res.status(200).json(result);
-    } catch (error: any) {
-        console.error('Error occurred:', error);
-        res.status(500).json({ error: error.message });
+   
+    if (!Array.isArray(postIds)) {
+      postIds = [postIds];
+      console.log('postIds is not an array, converted to array:', postIds);
     }
+
+    postIds = postIds.filter((id: string) => Types.ObjectId.isValid(id));
+
+    if (postIds.length === 0) {
+      res.status(400).json({ message: "postIds must contain valid post IDs" });
+      return;
+    }
+
+   
+    const posts: IPost[] = await Post.find({ _id: { $in: postIds } }).populate('user', 'username image');
+    const existingLikes = await Like.find({
+      user: userId,
+      post: { $in: postIds },
+    });
+
+   
+    const result = postIds.reduce((acc: Record<string, any>, postId: string) => {
+      const post = posts.find((p: IPost) => p._id.toString() === postId);
+      if (post) {
+        acc[postId] = {
+          isLike: existingLikes.some(like => like.post.toString() === postId),
+          likesCount: post.likesCount,
+        };
+      }
+      return acc;
+    }, {} as Record<string, any>);
+
+    res.status(200).json(result);
+  } catch (error: any) {
+    console.error('Error occurred:', error);
+    res.status(500).json({ error: error.message });
+  }
 };
-
-
-
-
-
-
 
 
 export const toggleLike = async (req: AuthRequest, res: Response): Promise<void> => {

@@ -16,7 +16,7 @@ const LoginForm = () => {
     const onSubmit = async(data) => {
         const result = await dispach(loginUser(data))
         if(result.payload){
-            navigate("/general")
+            navigate("/home")
         }
     }
 

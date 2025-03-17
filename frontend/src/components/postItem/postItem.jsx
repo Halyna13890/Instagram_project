@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { checkFollowingForUsers, toggleFollowing } from "../../redux/slieces/followerSlice";
 import { checkLikesForPosts, toggleLike } from "../../redux/slieces/likeSlise";
 import { useNavigate } from "react-router-dom";
 import defaultPhoto from "../../accets/icons8-user-default-64.png";
+import FollowButton from "../followButton/followButton"; 
 
 const PostItem = ({ post }) => {
   const dispatch = useDispatch();
@@ -11,31 +11,19 @@ const PostItem = ({ post }) => {
   const [expanded, setExpanded] = useState(false);
   const [localLikesCount, setLocalLikesCount] = useState(post.likesCount || 0);
 
-  const { following } = useSelector((state) => state.follow);
   const { likes } = useSelector((state) => state.likes);
-
-  const isFollowing = post.user ? following[post.user._id] || false : false;
   const isLiked = post._id && likes[post._id] ? likes[post._id].isLike : false;
 
   useEffect(() => {
-    if (post.user) {
-      dispatch(checkFollowingForUsers([post.user._id]));
-    }
     dispatch(checkLikesForPosts([post._id]));
-  }, [dispatch, post.user?._id, post._id]);
-
-  const handleToggleFollow = () => {
-    if (post.user) {
-      dispatch(toggleFollowing(post.user._id));
-    }
-  };
+  }, [dispatch, post._id]);
 
   const handleToggleLike = () => {
     dispatch(toggleLike(post._id))
       .unwrap()
       .then((response) => {
-        const { likesCount } = response; // Используем likesCount из ответа
-        setLocalLikesCount(likesCount); // Обновляем localLikesCount
+        const { likesCount } = response;
+        setLocalLikesCount(likesCount);
       })
       .catch((error) => {
         console.error("Error toggling like:", error);
@@ -64,9 +52,8 @@ const PostItem = ({ post }) => {
               <p className="user-name">{post.user.username}</p>
             </div>
             <div className="follow-button">
-              <button onClick={handleToggleFollow}>
-                {isFollowing ? "Following" : "Follow"}
-              </button>
+              
+              <FollowButton userId={post.user?._id} />
             </div>
           </>
         )}
