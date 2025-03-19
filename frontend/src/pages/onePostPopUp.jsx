@@ -5,7 +5,9 @@ import { fetchComments } from "../redux/slieces/commentSlice";
 import { useParams } from "react-router-dom";
 import defaultPhoto from "../accets/icons8-user-default-64.png";
 import api from "../api/interceptor";
-import FollowButton from "../components/followButton/followButton"
+import FollowButton from "../components/followButton/followButton";
+import ThreeDotsMenu from "../components/threeDotPopUp/threeDotPopUp";
+import ClickableProfileImage from "../components/ClickableProfileImage/ClickableProfileImage"; 
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -52,17 +54,26 @@ const PostModal = () => {
   return (
     <div className="post-modal">
       <div>
+        {singlePost && <ThreeDotsMenu postId={singlePost._id} />}
         {singlePost?.image && <img src={singlePost.image} alt="Post" />}
       </div>
       <div>
         <div>
-          <img src={singlePost?.user?.image || defaultPhoto} alt={singlePost?.user?.username || "User"} />
+          
+          <ClickableProfileImage
+            image={singlePost?.user?.image || defaultPhoto}
+            userId={singlePost?.user?._id} 
+          />
           <p>{singlePost?.user?.username || "Unknown User"}</p>
           <FollowButton userId={singlePost?.user?._id} />
         </div>
         <div>
           <div>
-            <img src={singlePost?.user?.image || defaultPhoto} alt={singlePost?.user?.username || "User"} />
+            
+            <ClickableProfileImage
+              image={singlePost?.user?.image || defaultPhoto}
+              userId={singlePost?.user?._id} 
+            />
           </div>
           <div>
             <p>{singlePost?.user?.username || "Unknown User"}</p>
@@ -75,7 +86,11 @@ const PostModal = () => {
               comments.map((comment) => (
                 <div key={comment._id} className="comment">
                   <div className="comment-user-info">
-                    <img src={comment?.user?.image || defaultPhoto} alt={comment?.user?.username || "User"} />
+                    
+                    <ClickableProfileImage
+                      image={comment?.user?.image || defaultPhoto}
+                      userId={comment?.user?._id} 
+                    />
                     <p>{comment?.user?.username || "Unknown User"}</p>
                   </div>
                   <p>{comment.message}</p>

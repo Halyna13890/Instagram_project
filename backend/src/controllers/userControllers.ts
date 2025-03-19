@@ -75,12 +75,9 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
 
 
 export const getProfile = async (req: AuthRequest, res: Response): Promise<void> => {
-    try {
-       
+    try {  
         const {id} = req.params
-      
-        
-        const profile = await User.findById(id).select("username about photoProfile website")
+        const profile = await User.findById(id).select("username about image website followers following")
 
         if(!profile){
             res.status(404).json({message: "Profile not faund"})

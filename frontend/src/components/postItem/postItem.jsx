@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { checkLikesForPosts, toggleLike } from "../../redux/slieces/likeSlise";
 import { useNavigate } from "react-router-dom";
 import defaultPhoto from "../../accets/icons8-user-default-64.png";
-import FollowButton from "../followButton/followButton"; 
+import FollowButton from "../followButton/followButton";
+import ClickableProfileImage from "../ClickableProfileImage/ClickableProfileImage"; 
 
 const PostItem = ({ post }) => {
   const dispatch = useDispatch();
@@ -38,21 +39,22 @@ const PostItem = ({ post }) => {
     }
   };
 
+  const MAX_LENGTH = 10;
+
   return (
     <div className="post-item">
       <div className="post-header">
         {post.user && (
           <>
             <div className="user-info">
-              <img
-                src={post.user.image || defaultPhoto}
-                alt="User"
-                className="user-image"
+             
+              <ClickableProfileImage
+                image={post.user.image || defaultPhoto}
+                userId={post.user._id} 
               />
               <p className="user-name">{post.user.username}</p>
             </div>
             <div className="follow-button">
-              
               <FollowButton userId={post.user?._id} />
             </div>
           </>
@@ -81,9 +83,21 @@ const PostItem = ({ post }) => {
           <>
             <p>{post.user.username}</p>
             <p>
-              {expanded ? post.text : `${post.text.slice(0, 100)}...`}
-              {!expanded && post.text.length > 100 && (
-                <button onClick={() => setExpanded(true)}>more</button>
+              {expanded || post.text.length <= MAX_LENGTH ? (
+                post.text
+              ) : (
+                <>
+                  {post.text.slice(0, MAX_LENGTH)}
+                  <span
+                    onClick={() => setExpanded(true)}
+                    style={{
+                      cursor: "pointer",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    ...
+                  </span>
+                </>
               )}
             </p>
           </>

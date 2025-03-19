@@ -16,6 +16,7 @@ router.put("/profile/:id", authMiddleware, uploadMiddleware.single("image"), upd
 router.get("/profile/:id", authMiddleware, getProfile)
 router.post("/forgot-password", authMiddleware,requestPasswordReset);
 router.post("/reset-password/:token", authMiddleware, resetPassword);
-router.get("/", searchUser, authMiddleware)
+router.get("/search", authMiddleware, searchUser)
 
 export default router
+

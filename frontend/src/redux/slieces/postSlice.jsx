@@ -22,6 +22,27 @@ export const fetchAllPosts = createAsyncThunk(
 );
 
 
+export const fetchUserPosts = createAsyncThunk(
+  "posts/fetchUserPosts",
+  async (userId, { rejectWithValue }) => {
+    try {
+      console.log("Fetching posts for userId:", userId);
+      const response = await api.get(`${API_URL}/posts/oneuser/${userId}`);
+      console.log("Posts response:", response.data);
+
+      if (response.data.error) {
+        console.error("Error fetching posts:", error);
+        return rejectWithValue(response.data.error);
+      }
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+
 export const fetchOnePost = createAsyncThunk(
   "posts/fetchOnePost",
   async (postId, { rejectWithValue }) => {
@@ -43,6 +64,7 @@ const allPostsSlice = createSlice({
   name: "allPosts",
   initialState: {
     posts: [],
+    userPosts: [],
     singlePost: null, 
     loading: false,
     error: null,
@@ -50,6 +72,7 @@ const allPostsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      
       .addCase(fetchAllPosts.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -63,8 +86,21 @@ const allPostsSlice = createSlice({
         state.loading = false;
         state.error = action.payload || action.error.message;
       })
-
-     
+      
+      .addCase(fetchUserPosts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserPosts.fulfilled, (state, action) => {
+        state.userPosts = action.payload;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(fetchUserPosts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      })
+      
       .addCase(fetchOnePost.pending, (state) => {
         state.loading = true;
         state.error = null;

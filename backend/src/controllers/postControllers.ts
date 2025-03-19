@@ -54,13 +54,14 @@ export const getUserPosts = async (req: AuthRequest, res: Response): Promise<voi
     try {
         const { id } = req.params; 
 
+
         if (!id) {
            res.status(403).json({ message: "User ID is required in URL" });
            return 
         }
 
         const userPosts = await Post.find({ user: id })
-        .populate("user", "image username")
+        
         
 
         if (!userPosts || userPosts.length === 0) {
@@ -86,50 +87,57 @@ export const getUserPosts = async (req: AuthRequest, res: Response): Promise<voi
 
 export const createPost = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-        const { text } = req.body;
+      const { text } = req.body;
+  
+      if (!req.file) {
+        res.status(400).json({ message: "Image is required" });
+        return;
+      }
+  
+      const imageBuffer = req.file.buffer;
+      const base64Image = `data:${req.file.mimetype};base64,${imageBuffer.toString("base64")}`;
+  
+      const newPost = new Post({
+        text,
+        image: base64Image,
+        user: req.userId,
+      });
+  
+      await newPost.save();
+  
+      res.status(201).json({ message: "Post created successfully", post: newPost });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  };
+  
+    
+    export const deletePost = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const post = await Post.findById(id);
 
-       
-        if (!req.file) {
-            res.status(400).json({ message: "Image is required" });
+        if (!post) {
+            res.status(404).json({ message: "Post not found" });
             return;
         }
 
-        const imageBuffer = req.file.buffer;
-        const base64Image = `data:${req.file.mimetype};base64,${imageBuffer.toString("base64")}`;
+        console.log('Post userId: ', post.user.toString());
+        console.log('Request userId: ', req.userId);
 
-        const newPost = new Post({ text, image: base64Image, user: req.userId });
-        await newPost.save();
+        if (post.user.toString() !== req.userId) {
+            res.status(403).json({ message: "Access denied" });
+            return;
+        }
 
-        res.status(201).json({ message: "Post created successfully", post: newPost });
+        await post.deleteOne();
+        res.status(200).json({ message: `Post with id: ${id} was deleted` });
     } catch (error: any) {
+        console.error("Error during delete: ", error);
         res.status(500).json({ error: error.message });
     }
 };
 
-
-    
-    export const deletePost = async (req: AuthRequest, res: Response): Promise<void> => {
-        try {
-            const { id } = req.params;
-            const post = await Post.findById(id);
-    
-            if (!post) {
-                res.status(404).json({ message: "Post not found" });
-                return;
-            }
-    
-            if (post.user.toString() !== req.userId) {
-                res.status(403).json({ message: "Access denied" });
-                return;
-            }
-    
-            await post.deleteOne();
-    
-            res.status(200).json({ message: `Post with id: ${id} was deleted` });
-        } catch (error: any) {
-            res.status(500).json({ error: error.message });
-        }
-    };
 
 
 
