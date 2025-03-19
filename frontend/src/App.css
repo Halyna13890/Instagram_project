@@ -1,18 +1,20 @@
-
 .app-container {
   display: flex;
   height: 100vh;
-  flex-direction: row; 
+  flex-direction: row;
 }
 
 .sidebar {
-  width: 250px;
+  width: 200px;
   height: 100vh;
   background-color: #f0f0f0;
   padding: 20px;
-  flex-shrink: 0; 
-  position: fixed; 
-  z-index: 10; 
+  flex-shrink: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
 nav {
@@ -30,28 +32,29 @@ a {
   flex-grow: 1;
   padding: 20px;
   overflow-y: auto;
-  margin-left: 550px; /* Сдвигаем контент вправо, чтобы он не перекрывал основной сайдбар */
+  margin-left: 250px;
   display: flex;
-  justify-content: center; /* Центрируем контент */
-  align-items: center; /* Выравнивание по центру по вертикали */
-  height: 100vh; 
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
 .overlay-sidebar {
   position: fixed;
   top: 0;
-  left: 250px; 
+  left: 250px;
   width: 300px;
   height: 100vh;
   background: white;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
-  transform: translateX(-100%); 
+  transform: translateX(-100%);
   transition: transform 0.3s ease-in-out;
-  z-index: 5; 
+  z-index: 5;
 }
 
 .overlay-sidebar.open {
-  transform: translateX(250px); 
+  transform: translateX(0);
 }
 
 .overlay-backdrop {
@@ -60,11 +63,11 @@ a {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.3); 
+  background: rgba(0, 0, 0, 0.3);
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease-in-out;
-  z-index: 0; 
+  z-index: 4;
 }
 
 .overlay-backdrop.show {

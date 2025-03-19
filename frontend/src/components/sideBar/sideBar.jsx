@@ -1,23 +1,20 @@
 import React, { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import OverlaySidebar from "../overlaySideBar/OverlaySideBar";
 import ProfileLink from "../profileLink/ProfileLink";
 import Search from "../search/Search";
 import Notifications from "../notification/Notification";
-import Explore from "../../pages/explore";
 import "../../App.css";
 
 const Sidebar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [overlayContent, setOverlayContent] = useState(null);
 
- 
   const openSidebar = (content) => {
     setIsSidebarOpen(true);
     setOverlayContent(content);
   };
 
-  
   const closeSidebar = () => {
     setIsSidebarOpen(false);
     setOverlayContent(null);
@@ -37,12 +34,10 @@ const Sidebar = () => {
           </span>
           <Link to="/explore">Explore</Link>
           <Link to="/createPost">Create</Link>
-         
           <ProfileLink />
         </nav>
       </div>
 
-     
       <OverlaySidebar isOpen={isSidebarOpen} onClose={closeSidebar}>
         {overlayContent}
       </OverlaySidebar>
@@ -51,5 +46,3 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
-
-
