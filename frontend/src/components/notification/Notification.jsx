@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import api from "../../api/interceptor"; // Импортируем ваш api, где настроены запросы
+import React, { useState, useEffect } from "react"
+import { Link } from "react-router-dom"
+import api from "../../api/interceptor"
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -9,7 +9,7 @@ const Notifications = () => {
   const [likesNotifications, setLikesNotifications] = useState([]);
   const [commentsNotifications, setCommentsNotifications] = useState([]);
 
-  // Функция для получения уведомлений о подписках
+  
   const fetchFollowersNotifications = async () => {
     try {
       const response = await api.get(`${API_URL}/follow/time`);
@@ -19,7 +19,7 @@ const Notifications = () => {
     }
   };
 
-  // Функция для получения уведомлений о лайках
+
   const fetchLikesNotifications = async () => {
     try {
       const response = await api.get(`${API_URL}/like/time`);
@@ -29,7 +29,6 @@ const Notifications = () => {
     }
   };
 
-  // Функция для получения уведомлений о комментариях
   const fetchCommentsNotifications = async () => {
     try {
       const response = await api.get(`${API_URL}/comment/time`);
@@ -39,14 +38,13 @@ const Notifications = () => {
     }
   };
 
-  // Загружаем уведомления при монтировании компонента
   useEffect(() => {
     fetchFollowersNotifications();
     fetchLikesNotifications();
     fetchCommentsNotifications();
   }, []);
 
-  // Функция для рендеринга уведомлений
+ 
   const renderNotifications = (notifications) => {
     return notifications.map((notification) => (
       <div key={notification.id} className="notification-item">
@@ -67,7 +65,7 @@ const Notifications = () => {
     <div className="notifications-container">
       <h1>Notifications</h1>
 
-      {/* Объединяем все уведомления */}
+    
       {followersNotifications.length > 0 && renderNotifications(followersNotifications)}
       {likesNotifications.length > 0 && renderNotifications(likesNotifications)}
       {commentsNotifications.length > 0 && renderNotifications(commentsNotifications)}

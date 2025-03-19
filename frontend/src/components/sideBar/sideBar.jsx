@@ -4,6 +4,7 @@ import OverlaySidebar from "../overlaySideBar/OverlaySideBar";
 import ProfileLink from "../profileLink/ProfileLink";
 import Search from "../search/Search";
 import Notifications from "../notification/Notification";
+import Explore from "../../pages/explore";
 import "../../App.css";
 
 const Sidebar = () => {
@@ -34,7 +35,9 @@ const Sidebar = () => {
           <span className="sidebar-link" onClick={() => openSidebar(<Notifications />)}>
             Notifications
           </span>
+          <Link to="/explore">Explore</Link>
           <Link to="/createPost">Create</Link>
+         
           <ProfileLink />
         </nav>
       </div>

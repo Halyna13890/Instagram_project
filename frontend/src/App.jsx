@@ -11,11 +11,9 @@ import OnePostPopUp from "./pages/onePostPopUp";
 import CreatePostPage from "./pages/CreatePost";
 import EditPostPopUp from "./pages/editPostPopUp";
 import UserPage from "./pages/userPage";
-import ProfileLink from "./components/profileLink/ProfileLink";
 import EditProfilePage from "./pages/EditProfilePage";
-import Search from "./components/search/Search";
-import Notification from "./components/notification/Notification";
 import OverlaySidebar from "./components/overlaySideBar/OverlaySideBar";
+import Explore from './pages/explore';
 
 function App() {
   return (
@@ -30,22 +28,22 @@ function AppContent() {
   const noSidebarRoutes = ["/register", "/login"];
   const isSidebarVisible = !noSidebarRoutes.includes(location.pathname);
 
-  // Состояние для управления оверлейным сайдбаром
+  
   const [overlayContent, setOverlayContent] = useState(null);
 
-  // Функция для открытия оверлея
+ 
   const openOverlay = (content) => {
     setOverlayContent(content);
   };
 
-  // Функция для закрытия оверлея
+ 
   const closeOverlay = () => {
     setOverlayContent(null);
   };
 
   return (
     <div className="app-container">
-      {isSidebarVisible && <Sidebar openOverlay={openOverlay} />} {/* Передаем функцию для открытия оверлея */}
+      {isSidebarVisible && <Sidebar openOverlay={openOverlay} />} 
       
       <div className="content">
         <Routes>
@@ -59,12 +57,12 @@ function AppContent() {
               <Route path="/createPost" element={<CreatePostPage />} />
               <Route path="/profile/:userId" element={<UserPage />} />
               <Route path="/profile/:userId/edit" element={<EditProfilePage />}/>
+              <Route path="/explore" element={<Explore />}/>
             </Route>
           </Route>
         </Routes>
       </div>
 
-      {/* Оверлейный сайдбар, который открывается без изменения маршрута */}
       <OverlaySidebar isOpen={!!overlayContent} onClose={closeOverlay}>
         {overlayContent}
       </OverlaySidebar>

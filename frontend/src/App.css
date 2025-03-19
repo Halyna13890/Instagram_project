@@ -1,8 +1,8 @@
-/* Обновленный контейнер */
+
 .app-container {
   display: flex;
   height: 100vh;
-  flex-direction: row; /* Устанавливаем расположение в ряд */
+  flex-direction: row; 
 }
 
 .sidebar {
@@ -10,9 +10,9 @@
   height: 100vh;
   background-color: #f0f0f0;
   padding: 20px;
-  flex-shrink: 0; /* Сайдбар не сжимаем */
-  position: fixed; /* Фиксируем сайдбар */
-  z-index: 10; /* Устанавливаем высокий z-index для основного сайдбара */
+  flex-shrink: 0; 
+  position: fixed; 
+  z-index: 10; 
 }
 
 nav {
@@ -34,24 +34,24 @@ a {
   display: flex;
   justify-content: center; /* Центрируем контент */
   align-items: center; /* Выравнивание по центру по вертикали */
-  height: 100vh; /* Сделаем высоту контента 100% */
+  height: 100vh; 
 }
 
 .overlay-sidebar {
   position: fixed;
   top: 0;
-  left: 250px; /* Сдвигаем оверлей рядом с основным сайдбаром */
+  left: 250px; 
   width: 300px;
   height: 100vh;
   background: white;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
-  transform: translateX(-100%); /* Скрываем за Sidebar */
+  transform: translateX(-100%); 
   transition: transform 0.3s ease-in-out;
-  z-index: 5; /* Ставим ниже основного сайдбара */
+  z-index: 5; 
 }
 
 .overlay-sidebar.open {
-  transform: translateX(250px); /* Выдвигаем его рядом с основным сайдбаром */
+  transform: translateX(250px); 
 }
 
 .overlay-backdrop {
@@ -60,11 +60,11 @@ a {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.3); /* Затемняем только фон */
+  background: rgba(0, 0, 0, 0.3); 
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease-in-out;
-  z-index: 0; /* Ставим ниже оверлейного сайдбара */
+  z-index: 0; 
 }
 
 .overlay-backdrop.show {

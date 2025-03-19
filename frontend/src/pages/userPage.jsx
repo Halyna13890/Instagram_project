@@ -83,7 +83,7 @@ const UserPage = () => {
     }
   };
 
-  // Обработчик для перехода на страницу редактирования профиля
+
   const handleEditProfile = () => {
     navigate(`/profile/${userId}/edit`);
   };
