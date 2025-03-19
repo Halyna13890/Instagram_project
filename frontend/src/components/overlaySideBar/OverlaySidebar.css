@@ -32,3 +32,6 @@
     visibility: visible;
   }
   
+  .sidebar-content {
+    padding: 20px; /* Добавляем отступы со всех сторон */
+  }

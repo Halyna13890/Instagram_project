@@ -1,11 +1,78 @@
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import api from "../../api/interceptor"; // Импортируем ваш api, где настроены запросы
 
+const API_URL = import.meta.env.VITE_API_URL;
 
+const Notifications = () => {
+  const [followersNotifications, setFollowersNotifications] = useState([]);
+  const [likesNotifications, setLikesNotifications] = useState([]);
+  const [commentsNotifications, setCommentsNotifications] = useState([]);
 
-const Notification = () => {
-    return (
-        <div> notification </div>
-    ) 
+  // Функция для получения уведомлений о подписках
+  const fetchFollowersNotifications = async () => {
+    try {
+      const response = await api.get(`${API_URL}/follow/time`);
+      setFollowersNotifications(response.data);
+    } catch (error) {
+      console.error("Ошибка при получении уведомлений о подписках:", error);
+    }
+  };
 
-}
+  // Функция для получения уведомлений о лайках
+  const fetchLikesNotifications = async () => {
+    try {
+      const response = await api.get(`${API_URL}/like/time`);
+      setLikesNotifications(response.data);
+    } catch (error) {
+      console.error("Ошибка при получении уведомлений о лайках:", error);
+    }
+  };
 
-export default Notification
+  // Функция для получения уведомлений о комментариях
+  const fetchCommentsNotifications = async () => {
+    try {
+      const response = await api.get(`${API_URL}/comment/time`);
+      setCommentsNotifications(response.data);
+    } catch (error) {
+      console.error("Ошибка при получении уведомлений о комментариях:", error);
+    }
+  };
+
+  // Загружаем уведомления при монтировании компонента
+  useEffect(() => {
+    fetchFollowersNotifications();
+    fetchLikesNotifications();
+    fetchCommentsNotifications();
+  }, []);
+
+  // Функция для рендеринга уведомлений
+  const renderNotifications = (notifications) => {
+    return notifications.map((notification) => (
+      <div key={notification.id} className="notification-item">
+        <div>
+          <img
+            src={notification.image}
+            alt={notification.username}
+            className="notification-avatar"
+          />
+          <p>{notification.username}</p>
+        </div>
+        <p>{notification.timeMessage}</p>
+      </div>
+    ));
+  };
+
+  return (
+    <div className="notifications-container">
+      <h1>Notifications</h1>
+
+      {/* Объединяем все уведомления */}
+      {followersNotifications.length > 0 && renderNotifications(followersNotifications)}
+      {likesNotifications.length > 0 && renderNotifications(likesNotifications)}
+      {commentsNotifications.length > 0 && renderNotifications(commentsNotifications)}
+    </div>
+  );
+};
+
+export default Notifications;

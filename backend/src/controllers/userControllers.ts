@@ -214,7 +214,7 @@ export const searchUser = async (req:AuthRequest, res: Response): Promise <void>
             };
         }
 
-        const users = await User.find(filter).select("username fullName image");
+        const users = await User.find(filter).select("username fullName image _id");
 
         res.json(users);
     } catch (error: any) {
