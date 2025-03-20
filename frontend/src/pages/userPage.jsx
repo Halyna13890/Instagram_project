@@ -75,6 +75,15 @@ const UserPage = () => {
     fetchPostsData();
   }, [dispatch, userId]);
 
+  useEffect(() => {
+    // Логируем данные пользователя для проверки
+    if (user) {
+      console.log("User data from Redux:", user);
+      console.log("Followers:", user.followers);
+      console.log("Following:", user.following);
+    }
+  }, [user]);
+
   const handleViewPostDetails = postId => {
     if (postId) {
       navigate(`/post/${postId}`);
@@ -82,7 +91,6 @@ const UserPage = () => {
       console.error("Post ID is undefined");
     }
   };
-
 
   const handleEditProfile = () => {
     navigate(`/profile/${userId}/edit`);
@@ -109,8 +117,8 @@ const UserPage = () => {
             {user.website}
           </a>
           <div className="follow-info">
-            <span>{user.follower} Following</span>
-            <span>{user.following} Followers</span>
+            <span>Following {user.following}</span>
+            <span>Followers {user.followers}</span>
           </div>
 
           {currentUserId === userId ? (
