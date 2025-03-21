@@ -58,7 +58,7 @@ const EditPostPopUp = () => {
       return;
     }
 
-    console.log("⏳ Отправка данных на сервер:", {
+    console.log("Отправка данных на сервер:", {
       text: text !== post.text ? text : "(без изменений)",
       image: image ? image.name : "(без изменений)",
     });

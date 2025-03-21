@@ -5,12 +5,8 @@ import { useNavigate } from "react-router-dom";
 import defaultPhoto from "../../accets/icons8-user-default-64.png";
 import FollowButton from "../followButton/followButton";
 import ClickableProfileImage from "../ClickableProfileImage/ClickableProfileImage"; 
-import "./postItem.css"
-import heart from "../../accets/heart.svg"
-import redHeart from "../../accets/red_heart.png"
-import comment from "../../accets/Comment.svg"
 
-const PostItem = ({ post }) => { 
+const PostItem = ({ post }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
@@ -51,15 +47,15 @@ const PostItem = ({ post }) => {
         {post.user && (
           <>
             <div className="user-info">
+             
               <ClickableProfileImage
                 image={post.user.image || defaultPhoto}
                 userId={post.user._id} 
-                className="profile-image"
               />
               <p className="user-name">{post.user.username}</p>
             </div>
             <div className="follow-button">
-              <FollowButton userId={post.user?._id} className="custom-follow-button"/>
+              <FollowButton userId={post.user?._id} />
             </div>
           </>
         )}
@@ -74,16 +70,10 @@ const PostItem = ({ post }) => {
       />
 
       <div className="post-actions">
-        <button className="like" onClick={handleToggleLike}>
-          {isLiked ? (
-            <img className="heart" src={redHeart} alt="Liked" />
-          ) : (
-            <img className="heart" src={heart} alt="Not Liked" />
-          )}
+        <button onClick={handleToggleLike}>
+          {isLiked ? "❤️" : "🤍"}
         </button>
-        <button className="comment-botton" onClick={handleViewPostDetails}>
-          <img src={comment} className="comment-svg"/>
-        </button>
+        <button onClick={handleViewPostDetails}>💬</button>
       </div>
 
       <p className="likes-count">{localLikesCount} likes</p>
@@ -91,7 +81,7 @@ const PostItem = ({ post }) => {
       <div className="post-text">
         {post.user && (
           <>
-            <p className="user-name">{post.user.username}</p>
+            <p>{post.user.username}</p>
             <p>
               {expanded || post.text.length <= MAX_LENGTH ? (
                 post.text
@@ -100,9 +90,12 @@ const PostItem = ({ post }) => {
                   {post.text.slice(0, MAX_LENGTH)}
                   <span
                     onClick={() => setExpanded(true)}
-                    className="more"
+                    style={{
+                      cursor: "pointer",
+                      fontWeight: "bold",
+                    }}
                   >
-                    ...more
+                    ...
                   </span>
                 </>
               )}
@@ -111,10 +104,7 @@ const PostItem = ({ post }) => {
         )}
       </div>
 
-      <button className="View-comments" onClick={handleViewPostDetails}>
-        View all comments
-      </button>
-      <div className="line"></div>
+      <button onClick={handleViewPostDetails}>View all comments</button>
     </div>
   );
 };

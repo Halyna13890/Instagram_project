@@ -1,0 +1,96 @@
+.post-header {
+    display: flex;
+    gap: 20px;
+    align-items: center; 
+}
+  .user-info {
+    display: flex;
+    align-items: center; 
+    gap: 10px; 
+  }
+
+  .profile-image{
+    width: 30px;
+    height: 30px;
+  }
+
+  .user-name{
+    font-weight: 600;
+  }
+
+ 
+
+  .custom-follow-button{
+        background: none;
+        border: none;
+        color: #0095F6;
+        cursor: pointer;
+        padding: 0;
+        font-size: 16px;
+        font-weight: 600;
+        font-family: inherit;
+        margin-left: 20px;
+      }
+      
+      .custom-follow-button:hover {
+        color: darkblue;
+        
+      }
+      
+      .custom-follow-button:focus {
+        outline: none;
+  }
+
+
+  .heart{
+    width: 20px;
+    
+  }
+
+  .like{
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+
+  }
+
+  .comment-svg{
+    width: 20px;
+  }
+
+  .comment-botton{
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 14px;
+  }
+
+  .likes-count{
+    font-weight: 600;
+  }
+  .post-text{
+    display: flex;
+    gap: 10px;
+    width: 360px;
+  }
+  .more{
+    cursor: pointer;
+    color:rgba(115, 115, 115, 1);
+  }
+  .View-comments{
+    font-size: 12px;
+    color: rgba(115, 115, 115, 1);
+    font-weight: 400;
+    margin-bottom: 38px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .line{
+    width: 404px;
+    height: 0.86px;
+    background-color: rgba(219, 219, 219, 1);
+  }

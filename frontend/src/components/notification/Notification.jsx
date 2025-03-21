@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
 import api from "../../api/interceptor"
+import defaultPhoto from "../../accets/icons8-user-default-64.png";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -50,7 +50,7 @@ const Notifications = () => {
       <div key={notification.id} className="notification-item">
         <div>
           <img
-            src={notification.image}
+            src={notification.image || defaultPhoto}
             alt={notification.username}
             className="notification-avatar"
           />
