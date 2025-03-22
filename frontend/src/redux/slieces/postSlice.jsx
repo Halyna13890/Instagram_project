@@ -1,25 +1,27 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import api from "../../api/interceptor";
+import api from "../../api/interceptor"; 
+import { checkLikesForPosts } from "../slieces/likeSlise"
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-// Асинхронное действие для загрузки всех постов
 export const fetchAllPosts = createAsyncThunk(
   "posts/fetchAllPosts",
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.get(`${API_URL}/posts`);
       if (response.data.error) {
         return rejectWithValue(response.data.error);
       }
-      return response.data.posts;
+      const posts = response.data.posts;
+      const postIds = posts.map(post => post._id);
+      dispatch(checkLikesForPosts(postIds));
+      return posts;
     } catch (error) {
       return rejectWithValue(error.message);
     }
   }
 );
 
-// Асинхронное действие для загрузки постов пользователя
 export const fetchUserPosts = createAsyncThunk(
   "posts/fetchUserPosts",
   async (userId, { rejectWithValue }) => {
@@ -35,15 +37,15 @@ export const fetchUserPosts = createAsyncThunk(
   }
 );
 
-// Асинхронное действие для загрузки одного поста
 export const fetchOnePost = createAsyncThunk(
   "posts/fetchOnePost",
-  async (postId, { rejectWithValue }) => {
+  async (postId, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.get(`${API_URL}/posts/onepost/${postId}`);
       if (response.data.error) {
         return rejectWithValue(response.data.error);
       }
+      dispatch(checkLikesForPosts([postId]));
       return response.data.post;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -51,7 +53,6 @@ export const fetchOnePost = createAsyncThunk(
   }
 );
 
-// Асинхронное действие для удаления поста
 export const deletePost = createAsyncThunk(
   "posts/deletePost",
   async (postId, { rejectWithValue }) => {
@@ -64,7 +65,6 @@ export const deletePost = createAsyncThunk(
   }
 );
 
-// Асинхронное действие для обновления поста
 export const updatePost = createAsyncThunk(
   "posts/updatePost",
   async ({ postId, updatedData }, { rejectWithValue }) => {
@@ -72,7 +72,7 @@ export const updatePost = createAsyncThunk(
       const response = await api.put(`${API_URL}/posts/${postId}`, updatedData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      return response.data; // Возвращаем обновленный пост
+      return response.data; 
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Ошибка при обновлении поста");
     }
@@ -91,7 +91,6 @@ const allPostsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-     
       .addCase(fetchAllPosts.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -105,7 +104,6 @@ const allPostsSlice = createSlice({
         state.loading = false;
         state.error = action.payload || action.error.message;
       })
-
       .addCase(fetchUserPosts.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -119,8 +117,6 @@ const allPostsSlice = createSlice({
         state.loading = false;
         state.error = action.payload || action.error.message;
       })
-
-  
       .addCase(fetchOnePost.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -134,8 +130,6 @@ const allPostsSlice = createSlice({
         state.loading = false;
         state.error = action.payload || action.error.message;
       })
-
-    
       .addCase(deletePost.fulfilled, (state, action) => {
         state.posts = state.posts.filter((post) => post._id !== action.payload._id);
         state.userPosts = state.userPosts.filter((post) => post._id !== action.payload._id);
@@ -143,7 +137,6 @@ const allPostsSlice = createSlice({
       .addCase(deletePost.rejected, (state, action) => {
         state.error = action.payload;
       })
-
       .addCase(updatePost.fulfilled, (state, action) => {
         const updatedPost = action.payload;
         state.posts = state.posts.map((post) =>

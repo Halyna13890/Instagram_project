@@ -8,52 +8,47 @@ import { IntUser } from "../models/User";
 import { IPost } from '../models/Post';
 const { Types } = mongoose;
 
-
- 
-
 export const checkLikesForPosts = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.userId;
     let { postIds } = req.body;
 
-   
-    if (!Array.isArray(postIds)) {
-      postIds = [postIds];
-      console.log('postIds is not an array, converted to array:', postIds);
-    }
-
+    if (!Array.isArray(postIds)) postIds = [postIds];
     postIds = postIds.filter((id: string) => Types.ObjectId.isValid(id));
 
     if (postIds.length === 0) {
-      res.status(400).json({ message: "postIds must contain valid post IDs" });
-      return;
+       res.status(400).json({ message: "postIds must contain valid post IDs" });
+       return
     }
 
-   
-    const posts: IPost[] = await Post.find({ _id: { $in: postIds } }).populate('user', 'username image');
-    const existingLikes = await Like.find({
-      user: userId,
-      post: { $in: postIds },
-    });
+    
+    const posts = await Post.find({ _id: { $in: postIds } }).select("_id likesCount");
 
    
+    const userLikes = await Like.find({
+      user: userId,
+      post: { $in: postIds }
+    }).select("post");
+
+    
     const result = postIds.reduce((acc: Record<string, any>, postId: string) => {
-      const post = posts.find((p: IPost) => p._id.toString() === postId);
-      if (post) {
-        acc[postId] = {
-          isLike: existingLikes.some(like => like.post.toString() === postId),
-          likesCount: post.likesCount,
-        };
-      }
+      const post = posts.find(p => p._id.toString() === postId);
+      acc[postId] = {
+        isLike: userLikes.some(like => like.post.toString() === postId),
+        likesCount: post ? post.likesCount : 0
+      };
       return acc;
-    }, {} as Record<string, any>);
+    }, {});
 
     res.status(200).json(result);
   } catch (error: any) {
-    console.error('Error occurred:', error);
+    console.error("Error occurred:", error);
     res.status(500).json({ error: error.message });
   }
 };
+
+ 
+
 
 
 export const toggleLike = async (req: AuthRequest, res: Response): Promise<void> => {

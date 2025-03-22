@@ -2,19 +2,18 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllPosts } from "../../redux/slieces/postSlice";
 import PostItem from "../../components/postItem/postItem";
-import { useLocation } from "react-router-dom"; // Импортируем useLocation
+import { useLocation } from "react-router-dom"; 
 import "./homePage.css";
 
 const HomePage = () => {
   const dispatch = useDispatch();
   const { posts, loading, error } = useSelector((state) => state.allPosts);
-  const location = useLocation(); // Получаем объект location
+  const location = useLocation(); 
 
-  // Загружаем данные при каждом рендере или изменении location.key
   useEffect(() => {
-    console.log("Загрузка постов..."); // Логируем загрузку
+    console.log("Загрузка постов..."); 
     dispatch(fetchAllPosts());
-  }, [dispatch, location.key]); // Зависимость от location.key
+  }, [dispatch]); 
 
   return (
     <div>

@@ -106,7 +106,7 @@ const CreatePostPage = () => {
               accept="image/*"
               onChange={handleImageChange}
               ref={fileInputRef}
-              className="hidden-file-input"
+              style={{ display: 'none' }}
               required
             />
 

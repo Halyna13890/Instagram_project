@@ -54,14 +54,14 @@ const EditPostPopUp = () => {
     if (image) formData.append("image", image);
 
     if (!formData.has("text") && !formData.has("image")) {
-      alert("Вы не внесли изменений");
+      alert("You have not made any changes");
       return;
     }
 
     setLoadingUpdate(true);
     try {
       await dispatch(updatePost({ postId, updatedData: formData })).unwrap();
-      alert("Пост обновлён!");
+      alert("Post updated!");
       navigate(-1);
     } catch (error) {
       console.error("Ошибка при обновлении поста:", error);
