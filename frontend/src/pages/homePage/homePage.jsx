@@ -1,29 +1,20 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllPosts, deletePost } from "../../redux/slieces/postSlice"; // Импортируем deletePost
+import { fetchAllPosts } from "../../redux/slieces/postSlice";
 import PostItem from "../../components/postItem/postItem";
+import { useLocation } from "react-router-dom"; // Импортируем useLocation
 import "./homePage.css";
 
 const HomePage = () => {
   const dispatch = useDispatch();
   const { posts, loading, error } = useSelector((state) => state.allPosts);
+  const location = useLocation(); // Получаем объект location
 
-  
+  // Загружаем данные при каждом рендере или изменении location.key
   useEffect(() => {
+    console.log("Загрузка постов..."); // Логируем загрузку
     dispatch(fetchAllPosts());
-  }, [dispatch]);
-
-  
-  const handleDeletePost = async (postId) => {
-    try {
-      await dispatch(deletePost(postId)); 
-      
-    } catch (error) {
-      console.error("Error deleting post:", error);
-    }
-  };
-
-  console.log("Posts:", posts);
+  }, [dispatch, location.key]); // Зависимость от location.key
 
   return (
     <div>
@@ -33,11 +24,7 @@ const HomePage = () => {
       <div className="page-content">
         {posts.length > 0 ? (
           posts.map((post) => (
-            <PostItem
-              key={post._id}
-              post={post}
-              onDelete={handleDeletePost}
-            />
+            <PostItem key={post._id} post={post} />
           ))
         ) : (
           !loading && <p>No posts available.</p>

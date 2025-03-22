@@ -8,10 +8,10 @@ import RegisterPage from "./pages/registerPage";
 import LoginPage from "./pages/loginPage";
 import HomePage from "./pages/homePage/homePage";
 import OnePostPopUp from "./pages/onePostPopUp/onePostPopUp";
-import CreatePostPage from "./pages/CreatePost";
-import EditPostPopUp from "./pages/editPostPopUp";
-import UserPage from "./pages/userPage";
-import EditProfilePage from "./pages/EditProfilePage";
+import CreatePostPage from "./pages/CreatePost/CreatePost";
+import EditPostPopUp from "./pages/editPostPopUp/editPostPopUp";
+import UserPage from "./pages/userPage/userPage";
+import EditProfilePage from "./pages/EditProfilePage/EditProfilePage";
 import OverlaySidebar from "./components/overlaySideBar/OverlaySideBar";
 import Explore from './pages/explore';
 

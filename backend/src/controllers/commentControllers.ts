@@ -62,7 +62,7 @@ export const getPostsComments = async (req: AuthRequest, res: Response): Promise
         
 
         if (!postComments || postComments.length === 0) {
-             res.status(404).json({ message: "User posts not found" });
+             res.status(404).json({ message: "Comment not found" });
              return
         }
 
