@@ -35,6 +35,9 @@
     border: 1px solid rgba(219, 219, 219, 1);
 }
 
+.login-input:focus {
+    outline: 2px solid rgb(192, 139, 181); 
+  }
 .register-link{
     display: flex;
     justify-content: center;
