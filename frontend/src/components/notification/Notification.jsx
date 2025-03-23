@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react"
-import api from "../../api/interceptor"
+import React, { useState, useEffect } from "react";
+import api from "../../api/interceptor";
 import defaultPhoto from "../../accets/icons8-user-default-64.png";
+import "./notification.css"
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -19,7 +20,7 @@ const Notifications = () => {
     }
   };
 
-
+  
   const fetchLikesNotifications = async () => {
     try {
       const response = await api.get(`${API_URL}/like/time`);
@@ -28,6 +29,7 @@ const Notifications = () => {
       console.error("Ошибка при получении уведомлений о лайках:", error);
     }
   };
+
 
   const fetchCommentsNotifications = async () => {
     try {
@@ -38,37 +40,56 @@ const Notifications = () => {
     }
   };
 
+
   useEffect(() => {
     fetchFollowersNotifications();
     fetchLikesNotifications();
     fetchCommentsNotifications();
   }, []);
 
- 
+
   const renderNotifications = (notifications) => {
     return notifications.map((notification) => (
       <div key={notification.id} className="notification-item">
-        <div>
+        <div className="notification-content">
           <img
             src={notification.image || defaultPhoto}
             alt={notification.username}
             className="notification-avatar"
           />
-          <p>{notification.username}</p>
+          <div className="notification-text">
+            <p className="notification-username">{notification.username}</p>
+            <p className="notification-message">{notification.message}</p>
+            <p className="notification-time">{notification.timeMessage}</p>
+          </div>
         </div>
-        <p>{notification.timeMessage}</p>
       </div>
     ));
   };
-
   return (
     <div className="notifications-container">
       <h1>Notifications</h1>
 
     
-      {followersNotifications.length > 0 && renderNotifications(followersNotifications)}
-      {likesNotifications.length > 0 && renderNotifications(likesNotifications)}
-      {commentsNotifications.length > 0 && renderNotifications(commentsNotifications)}
+      {followersNotifications.length > 0 && (
+        <div className="notification-section">
+          {renderNotifications(followersNotifications)}
+        </div>
+      )}
+
+      
+      {likesNotifications.length > 0 && (
+        <div className="notification-section">
+          {renderNotifications(likesNotifications)}
+        </div>
+      )}
+
+      
+      {commentsNotifications.length > 0 && (
+        <div className="notification-section">
+          {renderNotifications(commentsNotifications)}
+        </div>
+      )}
     </div>
   );
 };
