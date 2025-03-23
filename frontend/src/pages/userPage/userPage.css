@@ -1,3 +1,12 @@
+
+.profile-avatar{
+    width: 100px;
+     height: 100px;
+     border-radius: 50%;
+       
+ }
+
+
 .profile-info{
     display: flex;
     justify-content: center;
@@ -36,9 +45,26 @@
     border-radius: 8px;
 }
 
-.profile-avatar{
-   width: 100px;
-    height: 100px;
-    border-radius: 50%;
-      
+.logout-btn{
+    background-color:rgba(239, 239, 239, 1);
+    border: none;
+    padding: 5px;
+    width: 169px;
+    height: 32;
+    border-radius: 8px;
+    margin-left: 10px;
 }
+
+.profile-follow-btn{
+    background: none;
+    border: none;
+    color: #0095F6;
+    cursor: pointer;
+    padding: 0;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: inherit;
+    margin-left: 20px; 
+
+}
+

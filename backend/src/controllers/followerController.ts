@@ -48,7 +48,6 @@ export const checkFollowingForUsers = async (req: AuthRequest, res: Response): P
   };
 
 
-
   
 export const getAllFollowers = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
