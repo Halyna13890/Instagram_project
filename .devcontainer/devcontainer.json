@@ -1,0 +1,40 @@
+{
+  "name": "Node.js & React Development (Full Stack)",
+  
+  // 1. Базовый образ
+  // Используем официальный образ Dev Container с предустановленным Node.js (v20)
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+
+  // 2. Установка зависимостей
+  // Команда, которая запускается при первом создании Codespace для установки всех зависимостей проекта.
+  "postCreateCommand": "npm install",
+
+  // 3. Перенаправление портов
+  // Ваш бэкенд (API) обычно работает на 8000 или 5000.
+  // Ваш фронтенд (React Dev Server) обычно работает на 3000.
+  "forwardPorts": [3000, 5000, 8000],
+  
+  // 4. Настройки VS Code
+  "customizations": {
+    "vscode": {
+      // Автоматическая установка рекомендуемых расширений
+      "extensions": [
+        // Основные расширения для JS/TS
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        
+        // Расширения для React
+        "dsznajder.es7-react-js-snippets",
+        
+        // Расширения для SCSS
+        "syler.sass-indented"
+      ]
+    }
+  },
+
+  // 5. Окружение
+  // Устанавливаем оболочку (shell) по умолчанию, если вам нужна Bash или Zsh
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {}
+  }
+}
