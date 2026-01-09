@@ -1,4 +1,4 @@
-import User, { IntUser } from "../models/User";
+import { IntUser, IntAuth, User, Auth } from "../models/User";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { AuthRequest } from "../middleware/authMidlleware";
@@ -7,29 +7,35 @@ import { sendResetPasswordEmail } from "../services/mailService";
 
 export const registerUser = async (req: Request, res: Response): Promise<any> => {
     try {
-        const { email, fullName, username, password } = req.body;
+        const { email, fullName, userName, password } = req.body;
 
         const existingEmail = await User.findOne({ email });
         if (existingEmail) {
             return res.status(400).json({ message: "User already exists" });
         }
 
-        const existingUsername = await User.findOne({ username });
+        const existingUsername = await User.findOne({ userName });
         if (existingUsername) {
             return res.status(400).json({ message: "Username already exists" });
         }
 
-        const newUser = new User({ email, fullName, username, password });
+        const newUser = new User({email, fullName, userName});
         await newUser.save();
 
+        const newAuth = new Auth ({user: newUser._id , password})
+        
+        await newAuth.save();
+
+         const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET as string, { expiresIn: "8h" });
         const userResponse = {
+            id: newUser._id,
             email: newUser.email,
             fullName: newUser.fullName,
-            username: newUser.username,
+            username: newUser.userName,
             about: newUser.about, 
             image: newUser.image, 
             website: newUser.website,
-
+            token
         }
 
         return res.status(201).json({ message: "User registered successfully", 
@@ -52,7 +58,7 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
             return res.status(400).json({ message: "Login or password is incorrect" });
         }
 
-        const isPasswordValid = await existingUser.comparePassword(password);
+        const isPasswordValid = await Auth.comparePassword(password);
         if (!isPasswordValid) {
             return res.status(400).json({ message: "Login or password is incorrect" });
         }

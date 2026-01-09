@@ -1,19 +1,24 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Types } from "mongoose";
 import bcrypt from "bcrypt";
 
 export interface IntUser extends Document {
     email: string;
     fullName: string;
-    username: string;
+    userName: string;
     about?: string;
     image?: string;
-    website?: string;
+    website?: string; 
+    followers: number;
+    following: number;
+}
+
+
+export interface IntAuth extends Document {
+    userId: Types.ObjectId
     password: string;
     comparePassword(candidatePassword: string): Promise<boolean>;
     resetPasswordToken?: string;
     resetPasswordExpires?: number;
-    followers: number;
-    following: number;
 }
 
 const UserSchema: Schema = new mongoose.Schema({
@@ -46,6 +51,23 @@ const UserSchema: Schema = new mongoose.Schema({
         required: false,
         default: ""
     },
+    followers:{
+        type:Number,
+        default: 0
+    }, 
+    following: {
+        type:Number,
+        default: 0
+    }
+});
+
+
+const AuthSchema: Schema = new mongoose.Schema({
+    userId: {
+      type: Schema.Types.ObjectId, 
+      ref: 'User', 
+      required: true,
+    },
     password: {
         type: String,
         required: true,
@@ -58,27 +80,22 @@ const UserSchema: Schema = new mongoose.Schema({
         type: Number,
         required: false,
     },
-    followers:{
-        type:Number,
-        default: 0
-    }, 
-    following: {
-        type:Number,
-        default: 0
-    }
 });
 
 
-UserSchema.pre<IntUser>("save", async function (next) {
+
+
+AuthSchema.pre<IntAuth>("save", async function (next) {
     if (!this.isModified("password")) return next();
     this.password = await bcrypt.hash(this.password, 10);
     next();
 });
 
 
-UserSchema.methods.comparePassword = async function (candidatePassword: string) {
+AuthSchema.methods.comparePassword = async function (candidatePassword: string) {
     return bcrypt.compare(candidatePassword, this.password);
 };
 
-const User = mongoose.model<IntUser>("User", UserSchema);
-export default User;
+
+export const User = mongoose.model<IntUser>("User", UserSchema)
+export const Auth = mongoose.model<IntAuth>("Auth", AuthSchema)
