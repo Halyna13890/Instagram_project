@@ -108,9 +108,9 @@ export const forgotPassword = createAsyncThunk(
 
 export const resetPassword = createAsyncThunk(
     'user/resetPassword',
-    async({token, PassData}: resetPasswordArg, {rejectWithValue}) => {
+    async({token, newPassword}: resetPasswordArg, {rejectWithValue}) => {
        try{
-          const response = await api.post<ApiMessageResponse>(`${API_URL}/reset-password/${token}`, PassData)
+          const response = await api.post<ApiMessageResponse>(`${API_URL}/reset-password/${token}`, newPassword)
           const message = response.data.message
 
           if(!message){
