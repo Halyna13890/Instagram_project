@@ -7,3 +7,8 @@ export interface ApiError {
     stack?: string;
 
 }
+
+
+export interface ApiMessageResponse {
+    message: string
+}

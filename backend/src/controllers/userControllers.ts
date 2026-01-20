@@ -22,12 +22,14 @@ export const registerUser = async (req: Request, res: Response): Promise<any> =>
         const newUser = new User({email, fullName, userName});
         await newUser.save();
 
-        const newAuth = new Auth ({user: newUser._id , password})
+        const newAuth = new Auth({user: newUser._id , password})
         
         await newAuth.save();
 
          const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET as string, { expiresIn: "8h" });
+
         const userResponse = {
+            user: {
             id: newUser._id,
             email: newUser.email,
             fullName: newUser.fullName,
@@ -35,6 +37,7 @@ export const registerUser = async (req: Request, res: Response): Promise<any> =>
             about: newUser.about, 
             image: newUser.image, 
             website: newUser.website,
+            },
             token
         }
 
@@ -54,11 +57,19 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
 
         
         const existingUser = await User.findOne({ email }) as IntUser;
+
         if (!existingUser) {
             return res.status(400).json({ message: "Login or password is incorrect" });
         }
+         
+        const exsistingUserPass = await Auth.findOne({userId: existingUser._id}) as IntAuth;
 
-        const isPasswordValid = await Auth.comparePassword(password);
+        if(!exsistingUserPass) {
+            return res.status(400).json({message: "Login or password is incorrect"});
+        }
+
+        const isPasswordValid = await exsistingUserPass.comparePassword(password);
+
         if (!isPasswordValid) {
             return res.status(400).json({ message: "Login or password is incorrect" });
         }
@@ -71,6 +82,11 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
             user: {
                 id: existingUser._id,
                 email: existingUser.email,
+                fullName: existingUser.fullName,
+                username: existingUser.userName,
+                about: existingUser.about, 
+                image: existingUser.image, 
+                website: existingUser.website,
             }
         });
 
@@ -147,8 +163,8 @@ export const requestPasswordReset = async (req: AuthRequest, res: Response): Pro
         }
 
        
-        const user = await User.findById(userId) as IntUser;
-        if (!user) {
+        const userPass = await Auth.findById(userId) as IntUser;
+        if (!userPass) {
              res.status(404).json({ message: "User not found" });
              return
         }
@@ -156,10 +172,10 @@ export const requestPasswordReset = async (req: AuthRequest, res: Response): Pro
        
         const token = crypto.randomBytes(32).toString("hex");
 
-        user.resetPasswordToken = token;
-        user.resetPasswordExpires = Date.now() + 3600000; 
+        userPass.resetPasswordToken = token;
+       userPass.resetPasswordExpires = Date.now() + 3600000; 
 
-        await user.save();
+        await userPass.save();
 
     
         await sendResetPasswordEmail(user.email, token);

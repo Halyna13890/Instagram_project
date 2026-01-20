@@ -3,6 +3,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import api from "../../api/interceptor";
 
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 
@@ -76,7 +77,6 @@ export const updateUserProfile = createAsyncThunk(
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-    token: Cookies.get("auth_token") || null,
     user: null,
     loading: false,
     error: null,
