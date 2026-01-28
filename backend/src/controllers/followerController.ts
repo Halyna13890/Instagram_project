@@ -2,7 +2,7 @@ import { Response } from "express";
 import { AuthRequest } from "../middleware/authMidlleware";
 import mongoose from "mongoose";
 import { IntUser } from "../models/User"
-import User from "../models/User"
+import {User} from "../models/User"
 import Follower, { PopulatedFollower, PopulatedFollowerEntry} from "../models/Followers";
 import {followersFormatTimeDifference} from "../utils/followerTimeFormat"
 
@@ -61,7 +61,7 @@ export const getAllFollowers = async (req: AuthRequest, res: Response): Promise<
         }
 
         const followerData = await Follower.findOne({ user: userId })
-            .populate<{ followers: { follower_id: IntUser }[] }>("followers.follower_id", "username image")
+            .populate<{ followers: { follower_id: IntUser }[] }>("followers.follower_id", "username avatar")
             .lean();
 
       
@@ -72,8 +72,8 @@ export const getAllFollowers = async (req: AuthRequest, res: Response): Promise<
 
         const existsFollowers = followerData.followers.map(f => ({
             id: f.follower_id._id,
-            username: f.follower_id.username,
-            image: f.follower_id.image,
+            username: f.follower_id.userName,
+            avatar: f.follower_id.avatar,
         }));
 
         res.json(existsFollowers);
@@ -91,7 +91,7 @@ export const getFollowing = async (req: AuthRequest, res: Response): Promise<voi
         const { userId } = req.params;
         
         const followingData = await Follower.find({ "followers.follower_id": userId })
-            .populate<{ user: IntUser }>("user", "username image")
+            .populate<{ user: IntUser }>("user", "username avatar")
             .lean();
         
         if (!followingData || followingData.length === 0) {
@@ -102,8 +102,8 @@ export const getFollowing = async (req: AuthRequest, res: Response): Promise<voi
         
         const following = followingData.map(record => ({
             id: record.user._id,
-            username: record.user.username,
-            image: record.user.image,
+            username: record.user.userName,
+            avatar: record.user.avatar,
         }));
         
         res.json(following);
@@ -247,7 +247,7 @@ export const getFollowersNotifications = async (req: AuthRequest, res: Response)
         console.log("Received request for followers of user:", userId);
 
         const myFollowers = await Follower.findOne({ user: userId })
-            .populate<{ followers: PopulatedFollowerEntry[] }>("followers.follower_id", "username image")
+            .populate<{ followers: PopulatedFollowerEntry[] }>("followers.follower_id", "username avatar")
             .lean();
         
         console.log("Query result from database:", myFollowers);
@@ -264,8 +264,8 @@ export const getFollowersNotifications = async (req: AuthRequest, res: Response)
             console.log("Processing follower:", follower);
             return {
                 id: follower.follower_id._id, 
-                username: follower.follower_id.username,
-                image: follower.follower_id.image,
+                username: follower.follower_id.userName,
+                avatar: follower.follower_id.avatar,
                 timeMessage: followersFormatTimeDifference(follower.createdAt) 
             };
         });

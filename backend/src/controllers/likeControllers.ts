@@ -146,7 +146,7 @@ export const getLikeNotifications = async (req: AuthRequest, res: Response): Pro
 
 
         const likeUsers = await Like.find({ postUser: userId })
-            .populate<{ user: IntUser }>("user", "username image")
+            .populate<{ user: IntUser }>("user", "username avatar")
             .lean();
 
         console.log(`Found ${likeUsers.length} like notifications`);
@@ -159,8 +159,8 @@ export const getLikeNotifications = async (req: AuthRequest, res: Response): Pro
 
         const formattedLikes = likeUsers.map(like => ({
             id: like._id,
-            username: like.user.username, 
-            image: like.user.image,
+            username: like.user.userName, 
+            avatar: like.user.avatar,
             timeMessage: likeFormatTimeDifference(like.createdAt)
         }));
        

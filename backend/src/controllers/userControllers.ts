@@ -35,7 +35,7 @@ export const registerUser = async (req: Request, res: Response): Promise<any> =>
             fullName: newUser.fullName,
             username: newUser.userName,
             about: newUser.about, 
-            image: newUser.image, 
+            avatar: newUser.avatar, 
             website: newUser.website,
             },
             token
@@ -85,7 +85,7 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
                 fullName: existingUser.fullName,
                 username: existingUser.userName,
                 about: existingUser.about, 
-                image: existingUser.image, 
+                avatar: existingUser.avatar, 
                 website: existingUser.website,
             }
         });
@@ -99,7 +99,7 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
 export const getProfile = async (req: AuthRequest, res: Response): Promise<void> => {
     try {  
         const {id} = req.params
-        const profile = await User.findById(id).select("username about image website followers following")
+        const profile = await User.findById(id).select("username about avatar website followers following")
 
         if(!profile){
             res.status(404).json({message: "Profile not faund"})
@@ -133,7 +133,7 @@ export const updateEditProfile = async (req: AuthRequest, res: Response): Promis
 
         const updatedProfile = await User.findByIdAndUpdate(
             req.userId,
-            { username, about, image: base64Image, website },
+            { username, about, avatar: base64Image, website },
             { new: true, runValidators: true }
         ).select("-password");
 
@@ -236,7 +236,7 @@ export const searchUser = async (req:AuthRequest, res: Response): Promise <void>
             };
         }
 
-        const users = await User.find(filter).select("username fullName image _id");
+        const users = await User.find(filter).select("username fullName avatar _id");
 
         res.json(users);
     } catch (error: any) {

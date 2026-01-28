@@ -1,11 +1,11 @@
-import { createSlice,  createAsyncThunk, rejectWithValue } from "@reduxjs/toolkit";
-import type {PayloadAction} from "@reduxjs/toolkit"
+import { createSlice,  createAsyncThunk} from "@reduxjs/toolkit";
 import axios from "axios";
 import api from "@/api/interceptor";
 import Cookies from "js-cookie";
-import type { ApiError, ApiMessageResponse } from "@/types/apiRequestsType";
+import {getErrorMessage} from "@/utils"
+import type { ApiMessageResponse } from "@/types/apiRequestsType";
 import type { ApiUser, LoginCredentials, RegisterCredentials, AuthResponse, 
-            AuthState, UpdateUserArg, resetPasswordArg} from "@/types/userType";
+            AuthState, UpdateUserArg, resetPasswordArg, searchUsersResponse} from "@/types/userType";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -18,9 +18,10 @@ export const registerUser = createAsyncThunk(
             const response = await api.post<AuthResponse>(`${API_URL}/api/register`, credentials);
             return response.data;
         } catch (error) {
-            return rejectWithValue(error as ApiError);
-        }
+           const errorMessage = getErrorMessage(error, "Registrierungsfehler")
+           return rejectWithValue(errorMessage)
     }
+}
 );
 
 
@@ -47,7 +48,8 @@ export const loginUser = createAsyncThunk(
 
             return {token, user};
         } catch (error) {
-            return rejectWithValue(error.response?.data?.message);
+            const errorMessage = getErrorMessage(error, "Loginfehler")
+           return rejectWithValue(errorMessage)
         }
     }
 );
@@ -59,16 +61,14 @@ export const fetchUserProfile = createAsyncThunk(
             async (userId: string, {rejectWithValue} ) => {
             try {
             const response = await api.get<ApiUser>(`${API_URL}/api/profile/${userId}`);
-            const user = response.data
+            
+           
 
-            if(!user){
-            throw new Error("User missing in response")
-            }
-
-            return user
+            return response.data
             
                 } catch (error) {
-                 return rejectWithValue(error.response?.data?.message);
+                  const errorMessage = getErrorMessage(error, "Fehler beim Laden der Benutzerdaten")
+                return rejectWithValue(errorMessage)
                 }
             }
 )
@@ -78,13 +78,11 @@ export const updateUserProfile = createAsyncThunk(
    async ({userId, userData}: UpdateUserArg, {rejectWithValue}) => {
         try{
             const response = await api.put<ApiUser>(`${API_URL}/profile/${userId}`, userData)
-            const user = response.data
-            if(!user){
-            throw new Error("User missing in response")
-            }
-            return user
+           
+            return response.data
     }catch (error) {
-                 return rejectWithValue(error.response?.data?.message);
+                const errorMessage = getErrorMessage(error, "Benutzerprofil nicht aktualisiert")
+                return rejectWithValue(errorMessage)
                 }
    }
     
@@ -95,13 +93,11 @@ export const forgotPassword = createAsyncThunk(
     async (_ , {rejectWithValue}) => {
         try{
             const response = await api.post<ApiMessageResponse>( `${API_URL}/forgot-password`)
-            const message = response.data.message
-             if(message){
-            throw new Error("Message missing in response")
-            }
-            return message
+            
+            return response.data
         } catch (error) {
-                 return rejectWithValue(error.response?.data?.message);
+                 const errorMessage = getErrorMessage(error, "Passwort-Änderungsanfrage nicht gesendett")
+                return rejectWithValue(errorMessage)
                 }
     }
 )
@@ -111,24 +107,42 @@ export const resetPassword = createAsyncThunk(
     async({token, newPassword}: resetPasswordArg, {rejectWithValue}) => {
        try{
           const response = await api.post<ApiMessageResponse>(`${API_URL}/reset-password/${token}`, newPassword)
-          const message = response.data.message
-
-          if(!message){
-            throw new Error("Message missing in response")
-          }
+          return response.data.message
+         
        } catch (error) {
-                 return rejectWithValue(error.response?.data?.message);
+                  const errorMessage = getErrorMessage(error, "Passwort nicht geändert")
+                return rejectWithValue(errorMessage)
                 }
     }
 )
 
 
+export const searchUsers = createAsyncThunk(
+    'user/searchUsers',
+    async (searchTerm: string, {rejectWithValue}) => {
+        try{
+            const response = await api.get<searchUsersResponse[]>(`${API_URL}/search`, {params: {search: searchTerm}})
+
+            return response.data
+
+        }  catch (error) {
+                 const errorMessage = getErrorMessage(error, "Fehler bei der Benutzersuche")
+                    return rejectWithValue(errorMessage)
+                }
+    } 
+    
+)
+
 const initialState: AuthState = {
         token: Cookies.get("auth_token") || null,
         user: null,
         loading: false,
+        errors: {
         authError: null,
         profileError: null,
+        forgotPassError: null,
+        resetPassError: null,
+        },
         success: false,
     }
 
@@ -149,58 +163,105 @@ const authSlise = createSlice({
 
          .addCase(registerUser.pending, (state) => {
             state.loading = true
-            state.authError = null
+            state.errors.authError = null
         })
 
         .addCase(registerUser.fulfilled, (state, action) => {
             state.loading = false
             state.token = action.payload.token
             state.user = action.payload.user
-            state.authError = null
+            state.errors.authError = null
         })
 
         .addCase(registerUser.rejected, (state, action) => {
             state.loading = false
-            state.authError = action.payload
-             state.authError = action.payload as string
+            state.errors.authError = action.payload
+            
             
         })
 
         .addCase(loginUser.pending, (state) => {
             state.loading = true
-            state.authError = null
+            state.errors.authError = null
         })
         .addCase(loginUser.fulfilled, (state, action) => {
             state.loading = false
             state.token = action.payload.token
             state.user = action.payload.user
-            state.authError = null
+            state.errors.authError = null
         })
         .addCase(loginUser.rejected, (state, action) => {
             state.loading = false
-            state.authError = action.payload as string
+            state.errors.authError = action.payload
         })
 
        .addCase(fetchUserProfile.pending, (state) => {
             state.loading = true
-            state.profileError = false 
+            state.errors.profileError = false 
        } )
        
        .addCase(fetchUserProfile.fulfilled, (state, action) => {
             state.loading = false
             state.user = action.payload
-            state.profileError = null
+            state.errors.profileError = null
        } )
 
         .addCase(fetchUserProfile.rejected, (state, action) => {
             state.loading = false
-            state.profileError = action.payload as string
-            
-           
+            state.errors.profileError = action.payload
+               
        } )
 
+       .addCase(updateUserProfile.pending, (state) => {
+            state.loading = true
+            state.errors.profileError = false
+       })
        
+       .addCase(updateUserProfile.fulfilled, (state, action) => {
+            state.loading = false
+            state.user = action.payload
+            state.errors.profileError = null
+       } )
        
+       .addCase(updateUserProfile.rejected, (state, action) => {
+            state.loading = false
+            state.errors.profileError = action.payload
+               
+       } )
+
+       .addCase(forgotPassword.pending, (state) => {
+            state.loading = true
+            state.errors.profileError = false
+       })
+       
+       .addCase(forgotPassword.fulfilled, (state) => {
+            state.loading = false
+       } )
+       
+       .addCase(forgotPassword.rejected, (state, action) => {
+            state.loading = false
+            state.errors.forgotPassError = action.payload
+               
+       } )
+
+
+        .addCase(resetPassword.pending, (state) => {
+            state.loading = true
+            state.errors.resetPassError = false
+       })
+       
+       .addCase(resetPassword.fulfilled, (state) => {
+            state.loading = false
+       } )
+       
+       .addCase(resetPassword.rejected, (state, action) => {
+            state.loading = false
+            state.errors.resetPassError = action.payload
+               
+       } )
+
+
+
 
     }
 })

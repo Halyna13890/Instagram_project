@@ -1,0 +1,13 @@
+{
+  "folders": [
+    {
+      "name": "Основной Проект (Public)",
+      "path": "."
+    },
+    {
+      "name": "Секретный Фронтенд (Private)",
+      "path": "../secret_instagram_front"
+    }
+  ],
+  "settings": {}
+}

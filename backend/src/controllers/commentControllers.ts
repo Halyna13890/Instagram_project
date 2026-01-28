@@ -58,7 +58,7 @@ export const getPostsComments = async (req: AuthRequest, res: Response): Promise
         }
 
         const postComments = await Comment.find({ post: id })
-        .populate("user", "image username")
+        .populate("user", "avatar username")
         
 
         if (!postComments || postComments.length === 0) {
@@ -83,13 +83,13 @@ export const getCommentNotifications = async (req: AuthRequest, res: Response): 
         const userId = req.userId;
 
         const CommentUsers = await Comment.find({ postUser: userId })
-            .populate<{ user: IntUser }>("user", "username image")
+            .populate<{ user: IntUser }>("user", "username avatar")
             .lean();
 
         const formattedLikes = CommentUsers.map(comment => ({
             id: comment._id,
-            username: comment.user.username, 
-            image: comment.user.image,
+            username: comment.user.userName, 
+            avatar: comment.user.avatar,
             timeMessage: commentFormatTimeDifference(comment.createdAt)
         }));
 

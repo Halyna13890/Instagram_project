@@ -6,7 +6,7 @@ export interface IntUser extends Document {
     fullName: string;
     userName: string;
     about?: string;
-    image?: string;
+    avatar?: string;
     website?: string; 
     followers: number;
     following: number;
@@ -41,7 +41,7 @@ const UserSchema: Schema = new mongoose.Schema({
         required: false,
         default: ""
     },
-    image:{
+    avatar:{
         type: String,
         required: false,
         default: ""
