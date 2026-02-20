@@ -3,7 +3,7 @@ import { IntUser } from "../models/User"
 
 export interface IPost extends Document {
     _id: Types.ObjectId;
-    image: string;
+    postImage: string;
     text: string;
     user: IntUser | Types.ObjectId;
     createAt: Date;
@@ -12,7 +12,7 @@ export interface IPost extends Document {
 }
 
 const postSchema = new mongoose.Schema<IPost>({
-    image:{
+    postImage:{
         type: String,
         required: true,
     },

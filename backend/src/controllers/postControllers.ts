@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 export const getAllPosts = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const posts = await Post.find({})     
-        .populate("user", "image username")
+        .populate("user", "avatar username")
         
   
 
@@ -34,7 +34,7 @@ export const getOnePost = async (req: AuthRequest, res: Response): Promise<void>
         }
         
         const post = await Post.findById(id)
-            .populate("user", "image username");
+            .populate("user", "avatar username");
 
        
         if (!post) {
@@ -99,7 +99,7 @@ export const createPost = async (req: AuthRequest, res: Response): Promise<void>
   
       const newPost = new Post({
         text,
-        image: base64Image,
+        postImage: base64Image,
         user: req.userId,
       });
   
@@ -122,8 +122,7 @@ export const createPost = async (req: AuthRequest, res: Response): Promise<void>
             return;
         }
 
-        console.log('Post userId: ', post.user.toString());
-        console.log('Request userId: ', req.userId);
+
 
         if (post.user.toString() !== req.userId) {
             res.status(403).json({ message: "Access denied" });
@@ -133,7 +132,6 @@ export const createPost = async (req: AuthRequest, res: Response): Promise<void>
         await post.deleteOne();
         res.status(200).json({ message: `Post with id: ${id} was deleted` });
     } catch (error: any) {
-        console.error("Error during delete: ", error);
         res.status(500).json({ error: error.message });
     }
 };
@@ -167,7 +165,7 @@ export const createPost = async (req: AuthRequest, res: Response): Promise<void>
             if (req.file) {
                 const imageBuffer = req.file.buffer;
                 const base64Image = `data:${req.file.mimetype};base64,${imageBuffer.toString("base64")}`;
-                post.image = base64Image;
+                post.postImage = base64Image;
             }
     
             await post.save();

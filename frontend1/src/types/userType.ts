@@ -4,9 +4,9 @@
     userId: string;
     email: string;
     fullName: string;
-    username: string;
+    userName: string;
     about?: string;
-    image?: string;
+    avatar?: string;
     website?: string; 
     followers: number;
     following: number;
@@ -32,10 +32,10 @@ export interface AuthResponse {
 
 
 export interface UpdateUserPayload {
-    username: ApiUser ['username'];
+    userName: ApiUser ['userName'];
     about?: ApiUser ['about'];
     website?: ApiUser ['website'];
-    image?: ApiUser ['image'];
+    avatar?: ApiUser ['avatar'];
 }
 
 export interface UpdateUserArg {
@@ -48,12 +48,26 @@ export interface resetPasswordArg {
     token: string
 }
 
+
+export interface searchUsersResponse {
+    userId: string
+    userName: string,
+    avatar?: string,
+    fullName: string,
+    
+}
+
+
  export interface AuthState {
     token: string | null,
     user: ApiUser | null,
     loading: boolean,
+    errors: {
     authError: unknown | null,
     profileError: unknown | null,
+    forgotPassError: unknown | null,
+    resetPassError: unknown | null,
+    },
     success: boolean, 
 }
 

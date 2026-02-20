@@ -1,5 +1,5 @@
 {
-  "name": "Node.js & React Development (Full Stack)",
+  "name": "Node.js & React Development (Full Stack) whith secret front",
   
   // 1. Базовый образ
   // Используем официальный образ Dev Container с предустановленным Node.js (v20)
@@ -7,7 +7,7 @@
 
   // 2. Установка зависимостей
   // Команда, которая запускается при первом создании Codespace для установки всех зависимостей проекта.
-  "postCreateCommand": "npm install",
+  "postCreateCommand": "npm install && cd .. && git clone https://github.com/Halyna13890/secret_instagram_front.git",
 
   // 3. Перенаправление портов
   // Ваш бэкенд (API) обычно работает на 8000 или 5000.
@@ -37,4 +37,10 @@
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {}
   }
+ 
+  
+ 
+
+  
 }
+
