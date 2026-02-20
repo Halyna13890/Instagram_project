@@ -8,7 +8,7 @@ A full-stack Instagram clone developed as a comprehensive learning project to ma
 ## 🛠 Tech Stack
 
 **Backend:**
-- Node.js & Express.js
+- **Node.js**
 - **MongoDB** with Mongoose (ODM)
 - **TypeScript** for robust, type-safe code
 - **JWT** (JSON Web Tokens) for authentication
@@ -24,7 +24,7 @@ A full-stack Instagram clone developed as a comprehensive learning project to ma
 - **Socket.io** for live chat
 
 **Styling:**
-- CSS 
+- **CSS**
 
 ## ✨ Features
 
@@ -50,7 +50,7 @@ This project was built with the primary goal of deepening practical knowledge in
 
 ### Prerequisites
 - Node.js (v18 or higher)
-- npm or yarn
+- npm
 - MongoDB instance (local or Atlas)
 
 ### Installation
