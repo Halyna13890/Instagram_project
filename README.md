@@ -88,7 +88,7 @@ This project was built with the primary goal of deepening practical knowledge in
     The frontend application will open at `http://localhost:3000`.
 
 ## 📸 Screenshots
-*(Coming soon - I'll add images of the feed, profile page, and chat interface)*
+*(Coming soon)*
 
 ## 🤝 Contributing
 This is a personal learning project, but suggestions and feedback are welcome!
